@@ -33,5 +33,5 @@ RUN apt-get update --fix-missing && \
     cmake --fix-missing
 
 RUN pip install -U pip && \
-    pip install fastprogress japanize-matplotlib && \
+    pip install fastprogress japanize-matplotlib kaggler && \
     pip install mecab-python3 pytest==3.6.0

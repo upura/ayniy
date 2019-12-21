@@ -42,4 +42,3 @@ if __name__ == '__main__':
     with timer('saving'):
         save_as_pickle(train, test, configs['cols_definition']['target_col'])
         print(f'train.shape: {train.shape}')
-        print(train.head)
