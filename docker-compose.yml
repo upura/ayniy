@@ -1,0 +1,12 @@
+version: "3"
+services:
+  ayniy:
+    build: .
+    volumes:
+      - $PWD:/working
+    working_dir: /working
+    ports:
+      - 8888:8888
+    environment:
+      - PYTHONPATH=/working
+    command: jupyter notebook --ip=0.0.0.0 --allow-root --no-browser
