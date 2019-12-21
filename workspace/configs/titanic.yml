@@ -1,5 +1,6 @@
 data:
-  input: 'titanic'
+  input: '../input/titanic'
+  output: 'outputs/titanic'
 cols_definition:
   id_col: 'PassengerId'
   target_col: 'Survived'

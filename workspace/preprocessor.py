@@ -14,7 +14,7 @@ if __name__ == '__main__':
         args = sys.argv
         configs = yaml.load(open(join('configs', f'{args[1]}.yml'), 'r+'))
 
-        input_dir = join('../input', configs['data']['input'])
+        input_dir = configs['data']['input']
         train = pd.read_csv(join(input_dir, 'train.csv'))
         test = pd.read_csv(join(input_dir, 'test.csv'))
         print(f'train.shape: {train.shape}')
@@ -40,5 +40,6 @@ if __name__ == '__main__':
                                                configs['preprocessing']['matrix_factorization'])
 
     with timer('saving'):
-        save_as_pickle(train, test, configs['cols_definition']['target_col'])
+        save_as_pickle(train, test, configs['cols_definition']['target_col'],
+                       configs['data']['output'])
         print(f'train.shape: {train.shape}')
