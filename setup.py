@@ -22,6 +22,8 @@ def get_install_requires():
         'tqdm',
         'numpy',
         'scikit-learn',
+        'matplotlib',
+        'seaborn',
         'pandas',
         'joblib',
         'kaggler'

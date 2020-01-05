@@ -80,7 +80,7 @@ def circle_encoding(train, test, encode_cols):
     return train, test
 
 
-def save_as_pickle(train, test, target_col, out_dir='outputs'):
+def save_as_pickle(train, test, target_col, out_dir='output'):
 
     X_train = train.drop(target_col, axis=1)
     y_train = train[target_col]
