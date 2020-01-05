@@ -1,9 +1,10 @@
 version: "3"
 services:
-  ayniy:
+  test:
     build: .
     volumes:
       - $PWD:/working
+    container_name: ayniy-test
     working_dir: /working
     ports:
       - 8888:8888
