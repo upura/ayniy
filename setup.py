@@ -9,7 +9,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 def get_version():
     # type: () -> str
 
-    version_filepath = os.path.join(os.path.dirname(__file__), 'vivid', 'version.py')
+    version_filepath = os.path.join(os.path.dirname(__file__), 'ayniy', 'version.py')
     with open(version_filepath) as f:
         for line in f:
             if line.startswith('__version__'):
