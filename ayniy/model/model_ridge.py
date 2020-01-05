@@ -1,7 +1,7 @@
 import os
 from sklearn.linear_model import Ridge
 
-from ayniy.model import Model
+from ayniy.model.model import Model
 from ayniy.utils import Data
 
 

@@ -1,7 +1,7 @@
 import os
 import xgboost as xgb
 
-from ayniy.model import Model
+from ayniy.model.model import Model
 from ayniy.utils import Data
 
 

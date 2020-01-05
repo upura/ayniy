@@ -6,7 +6,7 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from sklearn.preprocessing import StandardScaler
 
-from ayniy.model import Model as oriModel
+from ayniy.model.model import Model as oriModel
 from ayniy.utils import Data
 
 # tensorflowの警告抑制

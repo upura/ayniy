@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import lightgbm as lgb
 
-from ayniy.model import Model
+from ayniy.model.model import Model
 from ayniy.utils import Data
 
 

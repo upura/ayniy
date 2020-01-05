@@ -6,7 +6,7 @@ from keras.layers.normalization import BatchNormalization
 from keras.models import Sequential, load_model
 from sklearn.preprocessing import StandardScaler
 
-from ayniy.model import Model
+from ayniy.model.model import Model
 from ayniy.utils import Data
 
 # tensorflowの警告抑制

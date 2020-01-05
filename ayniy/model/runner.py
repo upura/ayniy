@@ -7,7 +7,7 @@ from typing import Union
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from ayniy.model import Model
+from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
 
 
