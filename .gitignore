@@ -1,5 +1,15 @@
+*.vec
+*.json
 *.csv
+*.pickle
 *.pkl
+*.zip
+*.model
+*.h5
+*.hdf5
+*.xlsx
+*.npy
+.vector_cache
 
 # Created by https://www.gitignore.io/api/macos,images,python,jupyternotebooks
 # Edit at https://www.gitignore.io/?templates=macos,images,python,jupyternotebooks

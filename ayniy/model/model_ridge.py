@@ -7,12 +7,13 @@ from ayniy.utils import Data
 
 class ModelRIDGE(Model):
 
-    def train(self, tr_x, tr_y, va_x=None, va_y=None):
+    def train(self, tr_x, tr_y, va_x=None, va_y=None, te_x=None):
 
         # ハイパーパラメータの設定
         params = dict(self.params)
         self.model = Ridge(**params)
         self.model.fit(tr_x, tr_y)
+        print(self.model.coef_)
 
     def predict(self, te_x):
         return self.model.predict(te_x)

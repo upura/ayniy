@@ -26,6 +26,9 @@ def get_install_requires():
         'seaborn',
         'pandas',
         'joblib',
+        'fastprogress',
+        'japanize-matplotlib',
+        'neologdn',
         'kaggler'
     ]
     return install_requires

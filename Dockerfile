@@ -16,6 +16,7 @@ RUN apt-get update --fix-missing && \
     mercurial \
     subversion \
     sudo \
+    git \
     zsh \
     openssh-server \
     wget \
@@ -33,5 +34,5 @@ RUN apt-get update --fix-missing && \
     cmake --fix-missing
 
 RUN pip install -U pip && \
-    pip install fastprogress japanize-matplotlib kaggler && \
-    pip install mecab-python3 pytest==3.6.0
+    pip install fastprogress japanize-matplotlib neologdn && \
+    pip install mecab-python3 kaggler

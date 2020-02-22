@@ -7,7 +7,7 @@ from ayniy.utils import Data
 
 class ModelXGB(Model):
 
-    def train(self, tr_x, tr_y, va_x=None, va_y=None):
+    def train(self, tr_x, tr_y, va_x=None, va_y=None, te_x=None):
 
         # データのセット
         validation = va_x is not None

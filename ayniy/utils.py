@@ -13,14 +13,12 @@ from sklearn.externals import joblib
 from contextlib import contextmanager
 from IPython.core.display import display, HTML
 import torch
-import tensorflow as tf
 
 
 def seed_everything(seed=777):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
     np.random.seed(seed)
-    tf.random.set_seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
