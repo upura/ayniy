@@ -29,19 +29,17 @@ train, test = count_encoding_interact(train, test, {'encode_col': categorical_co
 ### Matrix factorization
 
 ```python
-train, test = matrix_factorization(
-    train, test,
-    col_definition={'encode_col': configs['preprocessing']['matrix_factorization']},
-    option={'n_components_lda': 5, 'n_components_svd': 3})
+train, test = matrix_factorization(train, test,
+                                   col_definition={'encode_col': configs['preprocessing']['matrix_factorization']},
+                                   option={'n_components_lda': 5, 'n_components_svd': 3})
 ```
 
 ### Aggregation
 
 ```python
-train, test = aggregation(
-    train, test,
-    col_definition={'groupby_dict': configs['preprocessing']['aggregation']['groupby_dict'],
-                    'nunique_dict': configs['preprocessing']['aggregation']['nunique_dict']})
+train, test = aggregation(train, test,
+                          col_definition={'groupby_dict': configs['preprocessing']['aggregation']['groupby_dict'],
+                          'nunique_dict': configs['preprocessing']['aggregation']['nunique_dict']})
 ```
 
 ### Numeric interaction
@@ -53,11 +51,10 @@ train, test = numeric_interact(train, test, {'encode_col': numerical_col})
 ### Target encoding
 
 ```python
-train, test = target_encoding(
-    train, test,
-    col_definition={'encode_col': configs['preprocessing']['target_encoding'],
-                    'target_col': configs['cols_definition']['target_col']},
-    option={'cv': cv})
+train, test = target_encoding(train, test,
+                              col_definition={'encode_col': configs['preprocessing']['target_encoding'],
+                              'target_col': configs['cols_definition']['target_col']},
+                              option={'cv': cv})
 ```
 
 ### Use col
@@ -69,20 +66,19 @@ train, test = delete_cols(train, test, {'encode_col': use_col})
 ### Delete col
 
 ```python
-unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(
-    train, test,
-    col_definition={'escape_col': categorical_cols},
-    option={'threshold': 0.995})
+unique_cols, duplicated_cols, high_corr_cols = \
+    detect_delete_cols(train, test,
+                       col_definition={'escape_col': categorical_cols},
+                       option={'threshold': 0.995})
 train, test = delete_cols(train, test, unique_cols + duplicated_cols + high_corr_cols)
 ```
 
 ### Save as pickle
 
 ```python
-save_as_pickle(
-    train, test,
-    col_definition={'target_col': configs['cols_definition']['target_col']},
-    option={'exp_id': ''})
+save_as_pickle(train, test,
+               col_definition={'target_col': configs['cols_definition']['target_col']},
+               option={'exp_id': ''})
 ```
 
 ## ayiny.preprocessing.text
