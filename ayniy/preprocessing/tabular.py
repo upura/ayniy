@@ -393,6 +393,23 @@ def target_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dic
     return train, test
 
 
+def frequency_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+    """
+    col_definition: encode_col
+    """
+    n_train = len(train)
+    train = pd.concat([train, test], sort=False).reset_index(drop=True)
+
+    for f in col_definition['encode_col']:
+        grouped = train.groupby(f).size().reset_index(name=f'fe_{f}')
+        train = train.merge(grouped, how='left', on=f)
+        train[f'fe_{f}'] = train[f'fe_{f}'] / train[f'fe_{f}'].count()
+
+    test = train[n_train:].reset_index(drop=True)
+    train = train[:n_train]
+    return train, test
+
+
 def count_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     """
     col_definition: encode_col
