@@ -23,7 +23,7 @@ def use_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
 
 def detect_delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
     """
-    col_definition: encode_col
+    col_definition: escape_col
     option: threshold
     """
     unique_cols = list(train.columns[train.nunique() == 1])
@@ -33,8 +33,8 @@ def detect_delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: 
     counter = 0
     high_corr_cols = []
     try:
-        for feat_a in tqdm([x for x in train.columns if x in col_definition['escape_col']]):
-            for feat_b in [x for x in train.columns if x in col_definition['escape_col']]:
+        for feat_a in tqdm([x for x in train.columns if x not in col_definition['escape_col']]):
+            for feat_b in [x for x in train.columns if x not in col_definition['escape_col']]:
                 if feat_a != feat_b and feat_a not in high_corr_cols and feat_b not in high_corr_cols:
                     c = buf.loc[feat_a, feat_b]
                     if c > option['threshold']:
@@ -145,9 +145,9 @@ def save_as_pickle(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict
     else:
         X_test = test
 
-    Data.dump(X_train, join('output', f"X_train{option['exp_id']}.pkl"))
-    Data.dump(y_train, join('output', 'y_train.pkl'))
-    Data.dump(X_test, join('output', f"X_test{option['exp_id']}.pkl"))
+    Data.dump(X_train, join(option['output_dir'], f"X_train_{option['exp_id']}.pkl"))
+    Data.dump(y_train, join(option['output_dir'], f"y_train_{option['exp_id']}.pkl"))
+    Data.dump(X_test, join(option['output_dir'], f"X_test_{option['exp_id']}.pkl"))
 
 
 class GroupbyTransformer():

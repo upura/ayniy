@@ -1,0 +1,74 @@
+run_name: 'fe_00'
+data:
+  train: '../input/petfinder-adoption-prediction/train/train.csv'
+  test: '../input/petfinder-adoption-prediction/test/test.csv'
+  output_dir: '../input'
+cols_definition:
+  id_col: 'PetID'
+  target_col: 'AdoptionSpeed'
+  numerical_col: [
+    'Age',
+    'Dewormed',
+    'Fee',
+    'FurLength',
+    'Health',
+    'MaturitySize',
+    'PhotoAmt',
+    'Quantity',
+    'Sterilized',
+    'Vaccinated',
+    'VideoAmt'
+  ]
+  categorical_col: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
+  text_col: [
+    'Name',
+    'Description'
+  ]
+  delete_col: [
+    'Name',
+    'Description',
+    'PetID'
+  ]
+preprocessing:
+  aggregation:
+    groupby_dict: [
+      {
+          'key': ['RescuerID'],
+          'var': ['Age', 'Fee'],
+          'agg': ['mean', 'sum', 'median', 'min', 'max', 'var', 'std']
+      },
+    ]
+    nunique_dict: [
+      {
+          'key': ['RescuerID'],
+          'var': ['Breed1'],
+          'agg': ['nunique']
+      },
+    ]
+  matrix_factorization: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender'
+  ]
+  target_encoding: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
