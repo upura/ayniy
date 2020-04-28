@@ -1,6 +1,6 @@
 # Ayniy, All You Need is YAML
 
-Ayniy is a machine learning data pipeline especially for [Kaggle](https://www.kaggle.com).
+Ayniy is a supporting tool for machine learning competitions.
 
 # Documentation
 
