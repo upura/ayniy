@@ -1,3 +1,4 @@
+import warnings
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
@@ -380,6 +381,8 @@ def target_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dic
     col_definition: encode_col, target_col
     option: cv
     """
+    warnings.simplefilter('ignore')
+
     te = TargetEncoder(cv=option['cv'])
 
     train_fe = te.fit_transform(train[col_definition['encode_col']], train[col_definition['target_col']])

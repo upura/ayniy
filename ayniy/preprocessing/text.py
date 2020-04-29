@@ -16,10 +16,38 @@ from sklearn.decomposition import TruncatedSVD, NMF
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
 import scipy as sp
+import nltk
 from sklearn.feature_extraction.text import _document_frequency
 from sklearn.utils.validation import check_is_fitted
 from sklearn.mixture import GaussianMixture
 from collections import defaultdict
+
+
+def analyzer_bow(text):
+    sb = nltk.stem.snowball.SnowballStemmer('english')
+    stop_words = ['i', 'a', 'an', 'the', 'to', 'and', 'or', 'if', 'is', 'are', 'am', 'it', 'this', 'that', 'of', 'from', 'in', 'on']
+    text = text.lower()     # 小文字化
+    text = text.replace('\n', '')   # 改行削除
+    text = text.replace('\t', '')   # タブ削除
+    puncts = r',.":)(-!?|;\'$&/[]>%=#*+\\•~@£·_{}©^®`<→°€™›♥←×§″′Â█½à…“★”–●â►−¢²¬░¶↑±¿▾═¦║―¥▓—‹─▒：¼⊕▼▪†■’▀¨▄♫☆é¯♦¤▲è¸¾Ã⋅‘∞∙）↓、│（»，♪╩╚³・╦╣╔╗▬❤ïØ¹≤‡√。【】'
+    for punct in puncts:
+        text = text.replace(punct, f' {punct} ')
+    text = text.split(' ')  # スペースで区切る
+    text = [sb.stem(t) for t in text]
+
+    words = []
+    for word in text:
+        if (re.compile(r'^.*[0-9]+.*$').fullmatch(word) is not None):   # 数字が含まれるものは分割
+            for w in re.findall(r'(\d+|\D+)', word):
+                words.append(w)
+            continue
+        if word in stop_words:  # ストップワードに含まれるものは除外
+            continue
+        if len(word) < 2:   # 1文字、0文字（空文字）は除外
+            continue
+        words.append(word)
+
+    return ' '.join(words)
 
 
 class BM25Transformer(BaseEstimator, TransformerMixin):
@@ -288,16 +316,8 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     col_definition: text_col, target_col
     option: n_components, lang={'ja', 'en'}
     """
-    option['batch_size'] = len(train) + len(test)
-    option['max_length'] = 200
-    option['return_ds'] = True
-
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
-    train_ds, _ = get_torchtext(
-        train, test, col_definition=col_definition, option=option)
-
-    train_examples = train_ds.examples
 
     vectorizer = make_pipeline(
         TfidfVectorizer(),
@@ -311,7 +331,11 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
             n_jobs=1,
         ),
     )
-    X = np.array([' '.join(te.Text) for te in train_examples])
+
+    if option['lang'] == 'en':
+        X = [analyzer_bow(text) for text in train[col_definition['text_col']].fillna('')]
+    else:
+        raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
         'tfidf_svd_{}'.format(i) for i in range(option['n_components'])] + [

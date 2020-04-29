@@ -31,36 +31,45 @@ cols_definition:
     'RescuerID'
   ]
   text_col: [
-    'Name',
     'Description'
   ]
   delete_col: [
     'Name',
-    'Description',
+    # 'Description',
     'PetID'
   ]
 preprocessing:
-  aggregation:
-    groupby_dict: [
-      {
-          'key': ['RescuerID'],
-          'var': ['Age', 'Fee'],
-          'agg': ['mean', 'sum', 'median', 'min', 'max', 'var', 'std']
-      },
-    ]
-    nunique_dict: [
-      {
-          'key': ['RescuerID'],
-          'var': ['Breed1'],
-          'agg': ['nunique']
-      },
-    ]
+  count_null:
+    categorical_col
+  label_encoding:
+    categorical_col
+  frequency_encoding:
+    categorical_col
+  count_encoding:
+    categorical_col
+  count_encoding_interact:
+    categorical_col
   matrix_factorization: [
     'Type',
     'Breed1',
     'Breed2',
     'Gender'
   ]
+  aggregation:
+    groupby_dict: [
+      {
+        'key': ['RescuerID'],
+        'var': ['Age', 'Fee'],
+        'agg': ['mean', 'sum', 'median', 'min', 'max', 'var', 'std']
+      },
+    ]
+    nunique_dict: [
+      {
+        'key': ['RescuerID'],
+        'var': ['Breed1'],
+        'agg': ['nunique']
+      },
+    ]
   target_encoding: [
     'Type',
     'Breed1',
@@ -72,3 +81,6 @@ preprocessing:
     'State',
     'RescuerID'
   ]
+  numeric_interact:
+    numerical_col
+  get_tfidf: {'n_components': 5, 'lang': 'en'}

@@ -2,18 +2,19 @@ from os.path import join
 import pandas as pd
 import numpy as np
 from ayniy.utils import timer
-from ayniy.preprocessing.tabular import count_null
-from ayniy.preprocessing.tabular import label_encoding
-from ayniy.preprocessing.tabular import frequency_encoding
-from ayniy.preprocessing.tabular import count_encoding
-from ayniy.preprocessing.tabular import count_encoding_interact
-from ayniy.preprocessing.tabular import matrix_factorization
-from ayniy.preprocessing.tabular import target_encoding
-from ayniy.preprocessing.tabular import aggregation
-from ayniy.preprocessing.tabular import numeric_interact
-from ayniy.preprocessing.tabular import delete_cols
-from ayniy.preprocessing.tabular import detect_delete_cols
-from ayniy.preprocessing.tabular import save_as_pickle
+from ayniy.preprocessing.tabular import (count_null,
+                                         label_encoding,
+                                         frequency_encoding,
+                                         count_encoding,
+                                         count_encoding_interact,
+                                         matrix_factorization,
+                                         target_encoding,
+                                         aggregation,
+                                         numeric_interact,
+                                         delete_cols,
+                                         detect_delete_cols,
+                                         save_as_pickle)
+from ayniy.preprocessing.text import get_tfidf, get_count, get_swem, get_scdv
 from ayniy.utils import Data
 
 
@@ -29,33 +30,38 @@ class Tabular:
         self.cv = cv
 
     def create(self) -> None:
-        with timer('null counting'):
-            encode_col = list(self.train.columns)
-            encode_col.remove(self.cols_definition['target_col'])
-            train, test = count_null(self.train, self.test, {'encode_col': encode_col})
 
-        with timer('label encoding'):
-            categorical_col = self.cols_definition['categorical_col']
-            self.train, self.test = label_encoding(self.train, self.test, {'encode_col': categorical_col})
+        if 'count_null' in self.preprocessing.keys():
+            with timer('count_null'):
+                encode_col = list(self.train.columns)
+                encode_col.remove(self.cols_definition['target_col'])
+                train, test = count_null(self.train, self.test, {'encode_col': encode_col})
 
-        with timer('frequency encoding'):
-            self.train, self.test = frequency_encoding(self.train, self.test, {'encode_col': categorical_col})
+        if 'label_encoding' in self.preprocessing.keys():
+            with timer('label_encoding'):
+                self.train, self.test = label_encoding(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
 
-        with timer('count encoding'):
-            self.train, self.test = count_encoding(self.train, self.test, {'encode_col': categorical_col})
+        if 'frequency_encoding' in self.preprocessing.keys():
+            with timer('frequency_encoding'):
+                self.train, self.test = frequency_encoding(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
 
-        with timer('count encoding interact'):
-            self.train, self.test = count_encoding_interact(self.train, self.test, {'encode_col': categorical_col})
+        if 'count_encoding' in self.preprocessing.keys():
+            with timer('count_encoding'):
+                self.train, self.test = count_encoding(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
+
+        if 'count_encoding_interact' in self.preprocessing.keys():
+            with timer('count_encoding_interact'):
+                self.train, self.test = count_encoding_interact(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
 
         if 'matrix_factorization' in self.preprocessing.keys():
-            with timer('frequency encoding'):
+            with timer('matrix_factorization'):
                 self.train, self.test = matrix_factorization(
                     self.train, self.test,
                     {'encode_col': self.preprocessing['matrix_factorization']},
                     {'n_components_lda': 5, 'n_components_svd': 3})
 
         if 'target_encoding' in self.preprocessing.keys():
-            with timer('target encoding'):
+            with timer('target_encoding'):
                 self.train, self.test = target_encoding(
                     self.train, self.test,
                     {'encode_col': self.preprocessing['target_encoding'],
@@ -69,8 +75,16 @@ class Tabular:
                     {'groupby_dict': self.preprocessing['aggregation']['groupby_dict'],
                      'nunique_dict': self.preprocessing['aggregation']['nunique_dict']})
 
-        with timer('numeric interact'):
-            self.train, self.test = numeric_interact(self.train, self.test, {'encode_col': self.cols_definition['numerical_col']})
+        if 'numeric_interact' in self.preprocessing.keys():
+            with timer('numeric_interact'):
+                self.train, self.test = numeric_interact(self.train, self.test, {'encode_col': self.cols_definition['numerical_col']})
+
+        if 'get_tfidf' in self.preprocessing.keys():
+            with timer('get_tfidf'):
+                for tc in self.cols_definition['text_col']:
+                    self.train, self.test = get_tfidf(self.train, self.test,
+                                                      {'text_col': tc, 'target_col': self.cols_definition['target_col']},
+                                                      self.preprocessing['get_tfidf'])
 
         with timer('replace inf'):
             self.train = self.train.replace(np.inf, 9999999999).replace(-np.inf, -9999999999)
