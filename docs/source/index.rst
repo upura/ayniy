@@ -6,15 +6,11 @@
 Welcome to Ayniy's documentation!
 =================================
 
+Ayniy is a supporting tool for machine learning competitions.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   installation
+   quick_start_guide
