@@ -14,7 +14,7 @@ from ayniy.preprocessing.tabular import (count_null,
                                          delete_cols,
                                          detect_delete_cols,
                                          save_as_pickle)
-from ayniy.preprocessing.text import get_tfidf, get_count, get_swem, get_scdv
+from ayniy.preprocessing.text import get_tfidf, get_count
 from ayniy.utils import Data
 
 

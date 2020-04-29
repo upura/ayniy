@@ -2,7 +2,6 @@ import MeCab
 tagger = MeCab.Tagger('-Owakati')
 import torchtext
 from torchtext.vocab import Vectors
-import torch.nn as nn
 import numpy as np
 import pandas as pd
 import re
@@ -19,8 +18,6 @@ import scipy as sp
 import nltk
 from sklearn.feature_extraction.text import _document_frequency
 from sklearn.utils.validation import check_is_fitted
-from sklearn.mixture import GaussianMixture
-from collections import defaultdict
 
 
 def analyzer_bow_en(text):
@@ -265,52 +262,6 @@ def get_torchtext(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
     return train_dl, test_dl, TEXT, LABEL
 
 
-def get_swem(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
-    """
-    col_definition: text_col, target_col
-    option: agg={'max', 'mean'}, lang={'ja', 'en'}
-    """
-    option['batch_size'] = len(train)
-    option['max_length'] = 200
-    option['return_ds'] = False
-
-    train_dl, test_dl, TEXT, _ = get_torchtext(
-        train, test, col_definition=col_definition, option=option)
-
-    train_features = []
-    test_features = []
-    embedding = nn.Embedding(len(TEXT.vocab), 200).from_pretrained(TEXT.vocab.vectors)
-
-    for idx, batch in enumerate(train_dl):
-        vectors = embedding(batch.Text[0])
-
-        if option['agg'] == 'max':
-            swem = np.array([np.array(vec).max(axis=0) for vec in vectors])
-        elif option['agg'] == 'meam':
-            swem = np.array([np.array(vec).sum(axis=0) / np.all(np.array(vec) == 0, axis=1).sum() for vec in vectors])
-
-        train_features.append(swem)
-
-    for idx, batch in enumerate(test_dl):
-        vectors = embedding(batch.Text[0])
-
-        if option['agg'] == 'max':
-            swem = np.array([np.array(vec).max(axis=0) for vec in vectors])
-        elif option['agg'] == 'meam':
-            swem = np.array([np.array(vec).sum(axis=0) / np.all(np.array(vec) == 0, axis=1).sum() for vec in vectors])
-
-        test_features.append(swem)
-
-    train_add = pd.DataFrame(np.concatenate(train_features),
-                             columns=[f"swem_{option['agg']}_{i}" for i in range(np.concatenate(train_features).shape[1])])
-    test_add = pd.DataFrame(np.concatenate(test_features),
-                            columns=[f"swem_{option['agg']}_{i}" for i in range(np.concatenate(test_features).shape[1])])
-
-    train = pd.concat([train, train_add], axis=1)
-    test = pd.concat([test, test_add], axis=1)
-    return train, test
-
-
 def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
     """
     col_definition: text_col, target_col
@@ -379,123 +330,6 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
         'count_nmf_{}'.format(i) for i in range(option['n_components'])] + [
         'count_bm25_{}'.format(i) for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
-    test = train[n_train:].reset_index(drop=True)
-    train = train[:n_train]
-    return train, test
-
-
-def create_idf_dataframe(documents):
-    """
-    Args:
-        documents(list[str]):
-    Returns(pd.DataFrame):
-    """
-
-    d = defaultdict(int)
-
-    for doc in documents:
-        vocab_i = set(doc)
-        for w in list(vocab_i):
-            d[w] += 1
-
-    df_idf = pd.DataFrame()
-    df_idf['count'] = d.values()
-    df_idf['word'] = d.keys()
-    df_idf['idf'] = np.log(len(documents) / df_idf['count'])
-    return df_idf
-
-
-def create_document_vector(documents, w2t, n_embedding):
-    """
-    学習済みの word topic vector と分かち書き済みの文章, 使用されている単語から
-    文章ベクトルを作成するメソッド.
-    Args:
-        documents(list[list[str]]):
-        w2t(dict): 単語 -> 埋め込み次元の dict
-        n_embedding(int):
-    Returns:
-        embedded document vector
-    """
-    doc_vectors = []
-
-    for doc in documents:
-        vector_i = np.zeros(shape=(n_embedding,))
-        for w in doc:
-            try:
-                v = w2t[w]
-                vector_i += v
-            except KeyError:
-                continue
-        doc_vectors.append(vector_i)
-    return np.array(doc_vectors)
-
-
-def compress_document_vector(doc_vector, p=.04):
-    v = np.copy(doc_vector)
-    vec_norm = np.linalg.norm(v, axis=1)
-    # zero divide しないように
-    vec_norm = np.where(vec_norm > 0, vec_norm, 1.)
-    v /= vec_norm[:, None]
-
-    a_min = v.min(axis=1).mean()
-    a_max = v.max(axis=1).mean()
-    threshold = (abs(a_min) + abs(a_max)) / 2. * p
-    v[abs(v) < threshold] = .0
-    return v
-
-
-def get_scdv(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
-    """
-    col_definition: text_col, target_col
-    option: n_components, lang={'ja', 'en'}
-    """
-
-    n_train = len(train)
-    train = pd.concat([train, test], sort=False).reset_index(drop=True)
-
-    # 公式実装: https://github.com/dheeraj7596/SCDV/blob/master/20news/SCDV.py#L32 により tied で学習
-    # 共分散行列全部推定する必要が有るほど低次元ではないという判断?
-    # -> 多分各クラスの分散を共通化することで各クラスに所属するデータ数を揃えたいというのがお気持ちっぽい
-    clf = GaussianMixture(n_components=option['n_components'], covariance_type='tied', verbose=2)
-    clf.fit(TEXT.vocab.vectors)
-
-    # word probs は各単語のクラスタへの割当確率なので shape = (n_vocabs, n_components,)
-    word_probs = clf.predict_proba(TEXT.vocab.vectors)
-
-    # 単語ごとにクラスタへの割当確率を wv に対して掛け算する
-    # shape = (n_vocabs, n_components, n_wv_embed) になる
-    word_cluster_vector = np.array(TEXT.vocab.vectors)[:, None, :] * word_probs[:, :, None]
-
-    # idf
-    option['return_ds'] = True
-
-    train_ds, _ = get_torchtext(
-        train, test, col_definition=col_definition, option=option)
-
-    train_examples = train_ds.examples
-
-    df_use = pd.DataFrame()
-    use_words = list(TEXT.vocab.stoi.keys())
-    df_use['word'] = use_words
-    parsed_docs = pd.Series([' '.join(te.Text) for te in train_examples])
-    df_idf = create_idf_dataframe(parsed_docs)
-    df_use = pd.merge(df_use, df_idf, on='word', how='left')
-    idf = df_use['idf'].values
-
-    # topic vector を計算するときに concatenation するとあるが
-    # 単に 二次元のベクトルに変形して各 vocab に対して idf をかければ OK
-    topic_vector = word_cluster_vector.reshape(-1, option['n_components'] * 300) * idf[:, None]
-    # nanで影響が出ないように 0 で埋める
-    topic_vector[np.isnan(topic_vector)] = 0
-    word_to_topic = dict(zip(use_words, topic_vector))
-    n_embedding = topic_vector.shape[1]
-
-    cdv_vector = create_document_vector(parsed_docs, word_to_topic, n_embedding)
-    compressed = compress_document_vector(cdv_vector)
-    print(compressed.shape)
-    compressed = pd.DataFrame(compressed, columns=[
-        'scdv_{}'.format(i) for i in range(compressed.shape[1])])
-    train = pd.concat([train, compressed], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
     return train, test
