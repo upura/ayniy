@@ -35,7 +35,7 @@ cols_definition:
   ]
   delete_col: [
     'Name',
-    # 'Description',
+    'Description',
     'PetID'
   ]
 preprocessing:
@@ -79,3 +79,4 @@ preprocessing:
   numeric_interact: numerical_col
   get_tfidf: {'n_components': 5, 'lang': 'en'}
   get_count: {'n_components': 5, 'lang': 'en'}
+  # get_bert: {'n_components': 5, 'lang': 'en'}

@@ -1,14 +1,7 @@
-import MeCab
-tagger = MeCab.Tagger('-Owakati')
-import torchtext
-from torchtext.vocab import Vectors
 import numpy as np
 import pandas as pd
 import re
-import os
-import requests
-from tqdm import tqdm
-import zipfile
+from tqdm import tqdm_notebook as tqdm
 import neologdn
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.decomposition import TruncatedSVD, NMF
@@ -18,6 +11,8 @@ import scipy as sp
 import nltk
 from sklearn.feature_extraction.text import _document_frequency
 from sklearn.utils.validation import check_is_fitted
+from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
+import torch
 
 
 def analyzer_bow_en(text):
@@ -135,86 +130,6 @@ class BM25Transformer(BaseEstimator, TransformerMixin):
         return X
 
 
-def download_from_gdrive(id, destination):
-    """
-    Download file from Google Drive
-    :param str id: g-drive id
-    :param str destination: output path
-    :return:
-    """
-    url = "https://docs.google.com/uc?export=download"
-
-    session = requests.Session()
-    response = session.get(url, params={'id': id}, stream=True)
-    token = get_confirm_token(response)
-    if token:
-        print("get download warning. set confirm token.")
-        params = {'id': id, 'confirm': token}
-        response = session.get(url, params=params, stream=True)
-    save_response_content(response, destination)
-
-
-def get_confirm_token(response):
-    """
-    verify whether warned or not.
-    [note] In Google Drive Api, if requests content size is large,
-    the user are send to verification page.
-    :param requests.Response response:
-    :return:
-    """
-    for k, v in response.cookies.items():
-        if k.startswith("download_warning"):
-            return v
-
-    return None
-
-
-def save_response_content(response, destination):
-    """
-    :param requests.Response response:
-    :param str destination:
-    :return:
-    """
-    chunk_size = 1024 * 1024
-    print("start downloading...")
-    with open(destination, "wb") as f:
-        for chunk in tqdm(response.iter_content(chunk_size), unit="MB"):
-            f.write(chunk)
-    print("Finish!!")
-    print("Save to:{}".format(destination))
-
-
-def download_word_vector(save_dir='../ayniy/pretrained/'):
-    """
-    fasttext を用いて学習された日本語の word vector を取得します
-    データは以下の記事にあるものを使わせてもらっています. 感謝してつかいましょう^_^
-    > https://qiita.com/Hironsan/items/513b9f93752ecee9e670
-    Args:
-        to: 保存先ディレクトリ
-    Returns:
-    """
-    file_name = 'vector_neologd'
-    dl_path = os.path.join(save_dir, '{}.zip'.format(file_name))
-    # 展開すると model.vec という名前のファイルがあるのでそれが本体
-    model_path = os.path.join(save_dir, 'model.vec')
-
-    if not os.path.exists(model_path):
-        os.makedirs(save_dir, exist_ok=True)
-        download_from_gdrive('0ByFQ96A4DgSPUm9wVWRLdm5qbmc', destination=dl_path)
-        with zipfile.ZipFile(dl_path) as f:
-            f.extractall(save_dir)
-    else:
-        print('model already exist')
-
-
-def tokenizer(text):
-    sentence = tagger.parse(text)
-    sentence = re.sub(r'[0-9０-９a-zA-Zａ-ｚＡ-Ｚ]+', " ", sentence)
-    sentence = re.sub(
-        r'[\．_－―─！＠＃＄％＾＆\-‐|\\＊\“（）＿■×+α※÷⇒—●★☆〇◎◆▼◇△□(：〜～＋=)／*&^%$#@!~`){}［］…\[\]\"\'\”\’:;<>?＜＞〔〕〈〉？、。・,\./『』【】「」→←○《》≪≫\n\u3000]+', "", sentence)
-    return sentence.split()
-
-
 def text_normalize(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     """
     col_definition: text_col
@@ -224,47 +139,9 @@ def text_normalize(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict
     return train, test
 
 
-def get_torchtext(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
-    """
-    col_definition: text_col, target_col
-    option: batch_size=64, max_length=200, lang='ja', return_ds=False
-    """
-
-    train[[col_definition['text_col'], col_definition['target_col']]].to_csv('../input/train_text_df.csv', index=False)
-    test[[col_definition['text_col'], col_definition['target_col']]].to_csv('../input/test_text_df.csv', index=False)
-
-    TEXT = torchtext.data.Field(sequential=True, tokenize=tokenizer, use_vocab=True,
-                                include_lengths=True, batch_first=True, fix_length=option['max_length'])
-    LABEL = torchtext.data.Field(sequential=False, use_vocab=False)
-
-    train_ds = torchtext.data.TabularDataset(
-        path='../input/train_text_df.csv',
-        format='csv',
-        skip_header=True,
-        fields=[('Text', TEXT), ('Label', LABEL)])
-
-    test_ds = torchtext.data.TabularDataset(
-        path='../input/test_text_df.csv',
-        format='csv',
-        skip_header=True,
-        fields=[('Text', TEXT), ('Label', LABEL)])
-
-    if option['return_ds']:
-        return train_ds, test_ds
-
-    download_word_vector()
-    fasttext = Vectors(name='../ayniy/pretrained/model.vec')
-    TEXT.build_vocab(train_ds, min_freq=1, vectors=fasttext)
-
-    train_dl = torchtext.data.Iterator(train_ds, batch_size=option['batch_size'], train=True)
-    test_dl = torchtext.data.Iterator(test_ds, batch_size=option['batch_size'], train=False, sort=False)
-
-    return train_dl, test_dl, TEXT, LABEL
-
-
 def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
     """
-    col_definition: text_col, target_col
+    col_definition: text_col
     option: n_components, lang={'ja', 'en'}
     """
     n_train = len(train)
@@ -299,7 +176,7 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
 
 def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
     """
-    col_definition: text_col, target_col
+    col_definition: text_col
     option: n_components, lang={'ja', 'en'}
     """
 
@@ -329,6 +206,57 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
         'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
         'count_nmf_{}'.format(i) for i in range(option['n_components'])] + [
         'count_bm25_{}'.format(i) for i in range(option['n_components'])])
+    train = pd.concat([train, X], axis=1)
+    test = train[n_train:].reset_index(drop=True)
+    train = train[:n_train]
+    return train, test
+
+
+def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+    """
+    col_definition: text_col
+    option: n_components, lang={'ja', 'en'}
+    """
+
+    n_train = len(train)
+    train = pd.concat([train, test], sort=False).reset_index(drop=True)
+    vectorizer = make_pipeline(
+        make_union(
+            TruncatedSVD(n_components=option['n_components'], random_state=7),
+            make_pipeline(
+                BM25Transformer(use_idf=True, k1=2.0, b=0.75),
+                TruncatedSVD(n_components=option['n_components'], random_state=7)
+            ),
+            n_jobs=1,
+        ),
+    )
+
+    if option['lang'] == 'en':
+        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        model = BertModel.from_pretrained('bert-base-uncased')
+    elif option['lang'] == 'ja':
+        tokenizer = BertJapaneseTokenizer.from_pretrained('bert-base-japanese')
+        model = BertModel.from_pretrained('bert-base-japanese')
+    else:
+        raise ValueError
+
+    batch_size = 10
+    X = []
+    for i in tqdm(range(-1 * (-1 * n_train // batch_size)), leave=False):
+        encoded_data = tokenizer.batch_encode_plus(
+            list(train[col_definition['text_col']].fillna('').values)[i * batch_size: (i + 1) * batch_size],
+            pad_to_max_length=True,
+            add_special_tokens=True)
+        input_ids = torch.tensor(encoded_data['input_ids'])
+        outputs = model(input_ids)
+        X.append(outputs[0][:, 0, :])
+    X = torch.cat(X)
+    X = X.detach().numpy()
+    X = vectorizer.fit_transform(X).astype(np.float32)
+
+    X = pd.DataFrame(X, columns=[
+        'bert_svd_{}'.format(i) for i in range(option['n_components'])] + [
+        'bert_bm25_{}'.format(i) for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]

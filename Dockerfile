@@ -35,4 +35,5 @@ RUN apt-get update --fix-missing && \
 
 RUN pip install -U pip && \
     pip install fastprogress japanize-matplotlib neologdn && \
+    pip install transformers==2.5.1 && \
     pip install mecab-python3 kaggler

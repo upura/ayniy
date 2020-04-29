@@ -1,6 +1,7 @@
 import warnings
 import pandas as pd
 import numpy as np
+from tqdm import tqdm_notebook as tqdm
 from sklearn import preprocessing
 from os.path import join
 from sklearn.feature_extraction.text import CountVectorizer
@@ -32,7 +33,7 @@ def detect_delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: 
     counter = 0
     high_corr_cols = []
     try:
-        for feat_a in [x for x in train.columns if x not in col_definition['escape_col']]:
+        for feat_a in tqdm([x for x in train.columns if x not in col_definition['escape_col']], leave=False):
             for feat_b in [x for x in train.columns if x not in col_definition['escape_col']]:
                 if feat_a != feat_b and feat_a not in high_corr_cols and feat_b not in high_corr_cols:
                     c = buf.loc[feat_a, feat_b]

@@ -14,7 +14,7 @@ from ayniy.preprocessing.tabular import (count_null,
                                          delete_cols,
                                          detect_delete_cols,
                                          save_as_pickle)
-from ayniy.preprocessing.text import get_tfidf, get_count
+from ayniy.preprocessing.text import get_tfidf, get_count, get_bert
 from ayniy.utils import Data
 
 
@@ -84,15 +84,21 @@ class Tabular:
             with timer('get_tfidf'):
                 for tc in self.cols_definition['text_col']:
                     self.train, self.test = get_tfidf(self.train, self.test,
-                                                      {'text_col': tc, 'target_col': self.cols_definition['target_col']},
+                                                      {'text_col': tc},
                                                       self.preprocessing['get_tfidf'])
 
         if 'get_count' in self.preprocessing.keys():
             with timer('get_count'):
                 for tc in self.cols_definition['text_col']:
                     self.train, self.test = get_count(self.train, self.test,
-                                                      {'text_col': tc, 'target_col': self.cols_definition['target_col']},
+                                                      {'text_col': tc},
                                                       self.preprocessing['get_count'])
+        if 'get_bert' in self.preprocessing.keys():
+            with timer('get_bert'):
+                for tc in self.cols_definition['text_col']:
+                    self.train, self.test = get_bert(self.train, self.test,
+                                                     {'text_col': tc},
+                                                     self.preprocessing['get_bert'])
 
         with timer('replace inf'):
             self.train = self.train.replace(np.inf, 9999999999).replace(-np.inf, -9999999999)
