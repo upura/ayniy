@@ -14,3 +14,4 @@ Ayniy is a supporting tool for machine learning competitions.
 
    installation
    quick_start_guide
+   reference/index
