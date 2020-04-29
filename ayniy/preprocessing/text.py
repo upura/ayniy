@@ -23,7 +23,7 @@ from sklearn.mixture import GaussianMixture
 from collections import defaultdict
 
 
-def analyzer_bow(text):
+def analyzer_bow_en(text):
     sb = nltk.stem.snowball.SnowballStemmer('english')
     stop_words = ['i', 'a', 'an', 'the', 'to', 'and', 'or', 'if', 'is', 'are', 'am', 'it', 'this', 'that', 'of', 'from', 'in', 'on']
     text = text.lower()     # 小文字化
@@ -318,7 +318,6 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
-
     vectorizer = make_pipeline(
         TfidfVectorizer(),
         make_union(
@@ -333,7 +332,7 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     )
 
     if option['lang'] == 'en':
-        X = [analyzer_bow(text) for text in train[col_definition['text_col']].fillna('')]
+        X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
@@ -352,17 +351,9 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     col_definition: text_col, target_col
     option: n_components, lang={'ja', 'en'}
     """
-    option['batch_size'] = len(train) + len(test)
-    option['max_length'] = 200
-    option['return_ds'] = True
 
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
-    train_ds, _ = get_torchtext(
-        train, test, col_definition=col_definition, option=option)
-
-    train_examples = train_ds.examples
-
     vectorizer = make_pipeline(
         CountVectorizer(min_df=2, max_features=20000,
                         strip_accents='unicode', analyzer='word', token_pattern=r'\w{1,}',
@@ -377,7 +368,11 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
             n_jobs=1,
         ),
     )
-    X = np.array([' '.join(te.Text) for te in train_examples])
+
+    if option['lang'] == 'en':
+        X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
+    else:
+        raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
         'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
@@ -454,14 +449,9 @@ def get_scdv(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     col_definition: text_col, target_col
     option: n_components, lang={'ja', 'en'}
     """
-    option['batch_size'] = len(train)
-    option['max_length'] = 200
-    option['return_ds'] = False
 
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
-    _, _, TEXT, _ = get_torchtext(
-        train, test, col_definition=col_definition, option=option)
 
     # 公式実装: https://github.com/dheeraj7596/SCDV/blob/master/20news/SCDV.py#L32 により tied で学習
     # 共分散行列全部推定する必要が有るほど低次元ではないという判断?

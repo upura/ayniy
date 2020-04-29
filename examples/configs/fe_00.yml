@@ -39,16 +39,11 @@ cols_definition:
     'PetID'
   ]
 preprocessing:
-  count_null:
-    categorical_col
-  label_encoding:
-    categorical_col
-  frequency_encoding:
-    categorical_col
-  count_encoding:
-    categorical_col
-  count_encoding_interact:
-    categorical_col
+  count_null: categorical_col
+  label_encoding: categorical_col
+  frequency_encoding: categorical_col
+  count_encoding: categorical_col
+  count_encoding_interact: categorical_col
   matrix_factorization: [
     'Type',
     'Breed1',
@@ -81,6 +76,6 @@ preprocessing:
     'State',
     'RescuerID'
   ]
-  numeric_interact:
-    numerical_col
+  numeric_interact: numerical_col
   get_tfidf: {'n_components': 5, 'lang': 'en'}
+  get_count: {'n_components': 5, 'lang': 'en'}

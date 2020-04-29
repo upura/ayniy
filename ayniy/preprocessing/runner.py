@@ -28,6 +28,7 @@ class Tabular:
         self.cols_definition = configs['cols_definition']
         self.preprocessing = configs['preprocessing']
         self.cv = cv
+        self.logger = {}
 
     def create(self) -> None:
 
@@ -86,6 +87,13 @@ class Tabular:
                                                       {'text_col': tc, 'target_col': self.cols_definition['target_col']},
                                                       self.preprocessing['get_tfidf'])
 
+        if 'get_count' in self.preprocessing.keys():
+            with timer('get_count'):
+                for tc in self.cols_definition['text_col']:
+                    self.train, self.test = get_count(self.train, self.test,
+                                                      {'text_col': tc, 'target_col': self.cols_definition['target_col']},
+                                                      self.preprocessing['get_count'])
+
         with timer('replace inf'):
             self.train = self.train.replace(np.inf, 9999999999).replace(-np.inf, -9999999999)
             self.test = self.test.replace(np.inf, 9999999999).replace(-np.inf, -9999999999)
@@ -93,9 +101,9 @@ class Tabular:
         with timer('delete cols'):
             unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(
                 self.train, self.test, {'escape_col': self.cols_definition['categorical_col']}, {'threshold': 0.995})
-            print('unique_cols: ', unique_cols)
-            print('duplicated_cols: ', duplicated_cols)
-            print('high_corr_cols: ', high_corr_cols)
+            self.logger['unique_cols'] = unique_cols
+            self.logger['duplicated_cols'] = duplicated_cols
+            self.logger['high_corr_cols'] = high_corr_cols
             self.train, self.test = delete_cols(
                 self.train, self.test,
                 {'encode_col': unique_cols + duplicated_cols + high_corr_cols + self.cols_definition['delete_col']})
