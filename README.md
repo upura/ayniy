@@ -4,7 +4,7 @@ Ayniy is a supporting tool for machine learning competitions.
 
 # Documentation
 
-- [ayiny.preprocessing](docs/preprocessing.md)
+https://upura.github.io/ayniy-docs/
 
 ## Environment
 
@@ -22,4 +22,21 @@ docker-compose up
 docker-compose build
 docker-compose up -d
 docker exec -it ayniy-test bash
+```
+
+## Docs
+
+```
+docker-compose build
+docker-compose up -d
+docker exec -it ayniy-test bash
+cd docs
+make html
+```
+
+```
+cd docs/build/html
+git a .
+git c "update"
+git push origin master
 ```
