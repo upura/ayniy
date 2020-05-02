@@ -5,6 +5,8 @@ import pandas as pd
 from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error
 import matplotlib.pyplot as plt
 import seaborn as sns
+import mlflow
+from mlflow import log_metric, log_param
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
@@ -16,8 +18,10 @@ logger = Logger()
 
 class Runner:
 
-    def __init__(self, configs: dict, cv=None):
-        self.run_name = configs['exp_name']
+    def __init__(self, configs: dict, cv):
+        self.exp_name = configs['exp_name']
+        self.run_name = configs['run_name']
+        self.fe_name = configs['fe_name']
         self.X_train = Data.load(f"../input/X_train_{configs['fe_name']}.pkl")
         self.y_train = Data.load(f"../input/y_train_{configs['fe_name']}.pkl")
         self.X_test = Data.load(f"../input/X_test_{configs['fe_name']}.pkl")
@@ -73,6 +77,9 @@ class Runner:
 
         学習・評価とともに、各foldのモデルの保存、スコアのログ出力についても行う
         """
+        # mlflow
+        mlflow.set_experiment(self.exp_name)
+        mlflow.start_run(run_name=self.run_name)
         logger.info(f'{self.run_name} - start training cv')
 
         scores = []
@@ -114,8 +121,16 @@ class Runner:
         # 予測結果の保存
         Data.dump(preds, f'../output/pred/{self.run_name}-train.pkl')
 
-        # 評価結果の保存
-        logger.result_scores(self.run_name, scores)
+        # mlflow
+        log_param('model_name', str(self.model_cls).split('.')[-1][:-2])
+        log_param('fe_name', self.fe_name)
+        log_param('train_params', self.params)
+        log_param('cv_strategy', str(self.cv))
+        log_param('evaluation_metric', self.evaluation_metric)
+        log_metric('cv_score', cv_score)
+        log_param('fold_scores', dict(zip([f'fold_{i}' for i in range(len(scores))], [round(s, 4) for s in scores])))
+        log_param('cols_definition', self.cols_definition)
+        mlflow.end_run()
 
     def run_predict_cv(self) -> None:
         """クロスバリデーションで学習した各foldのモデルの平均により、テストデータの予測を行う
