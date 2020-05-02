@@ -72,3 +72,4 @@ git a .
 git c "update"
 git push origin master
 ```
+https://github.com/upura/ayniy-docs
