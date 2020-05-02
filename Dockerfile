@@ -33,7 +33,7 @@ RUN apt-get update --fix-missing && \
     swig mecab libmecab-dev mecab-ipadic-utf8 \
     cmake --fix-missing
 
+COPY requirements.txt .
+
 RUN pip install -U pip && \
-    pip install fastprogress japanize-matplotlib neologdn && \
-    pip install transformers==2.5.1 && \
-    pip install mecab-python3 kaggler
+    pip install -r requirements.txt

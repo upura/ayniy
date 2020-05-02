@@ -1,0 +1,7 @@
+fastprogress
+japanize-matplotlib
+kaggler
+mecab-python3
+mlflow
+neologdn
+transformers==2.5.1
