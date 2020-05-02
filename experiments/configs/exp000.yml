@@ -1,0 +1,31 @@
+exp_name: 'exp000'
+fe_name: 'fe000'
+data:
+  sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
+cols_definition:
+  id_col: 'PetID'
+  target_col: 'AdoptionSpeed'
+  categorical_col: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
+model_name: 'ModelCatRegressor'
+params: {
+  'depth': 6,
+  'learning_rate': 0.5,
+  'iterations': 1000,
+  'loss_function': 'RMSE',
+  'eval_metric': 'RMSE',
+  'random_seed': 777,
+  'allow_writing_files': False,
+  'task_type': "CPU",
+  'early_stopping_rounds': 50
+}
+evaluation_metric: 'rmse'

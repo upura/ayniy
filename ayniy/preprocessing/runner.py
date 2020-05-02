@@ -21,7 +21,7 @@ from ayniy.utils import Data
 class Tabular:
 
     def __init__(self, configs: dict, cv=None):
-        self.run_name = configs['run_name']
+        self.run_name = configs['fe_name']
         self.train = pd.read_csv(configs['data']['train'])
         self.test = pd.read_csv(configs['data']['test'])
         self.output_dir = configs['data']['output_dir']

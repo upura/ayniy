@@ -1,4 +1,4 @@
-run_name: 'fe_00'
+fe_name: 'fe000'
 data:
   train: '../input/petfinder-adoption-prediction/train/train.csv'
   test: '../input/petfinder-adoption-prediction/test/test.csv'

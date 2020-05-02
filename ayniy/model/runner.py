@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score
+from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error
 from typing import Callable
 from typing import Union
 import matplotlib.pyplot as plt
@@ -8,6 +8,7 @@ import seaborn as sns
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
+from ayniy.model.model_cat import ModelCatRegressor
 
 
 logger = Logger()
@@ -15,18 +16,21 @@ logger = Logger()
 
 class Runner:
 
-    def __init__(self, run_name: str, model_cls: Callable[[str, dict], Model],
-                 X_train, X_test, y_train, evaluation_metric,
-                 params: dict, categorical_features=None, n_fold=5):
-        self.run_name = run_name
-        self.model_cls = model_cls
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.evaluation_metric = evaluation_metric
-        self.params = params
-        self.categorical_features = categorical_features
-        self.n_fold = n_fold
+    def __init__(self, configs: dict, cv=None):
+        self.run_name = configs['exp_name']
+        self.X_train = Data.load(f"../input/X_train_{configs['fe_name']}.pkl")
+        self.y_train = Data.load(f"../input/y_train_{configs['fe_name']}.pkl")
+        self.X_test = Data.load(f"../input/X_test_{configs['fe_name']}.pkl")
+        self.evaluation_metric = configs['evaluation_metric']
+        self.params = configs['params']
+        self.cols_definition = configs['cols_definition']
+        self.cv = cv
+        self.sample_submission = configs['data']['sample_submission']
+
+        if configs['model_name']:
+            self.model_cls = ModelCatRegressor
+        else:
+            raise ValueError
 
     def train_fold(self, i_fold: int):
         """クロスバリデーションでのfoldを指定して学習・評価を行う
@@ -41,9 +45,7 @@ class Runner:
         y_train = self.y_train
 
         # 学習データ・バリデーションデータをセットする
-        fold_id = pd.read_csv('../input/fold_id.csv', header=None)
-        tr_idx = X_train.loc[(fold_id != i_fold)[0]].index
-        va_idx = X_train.loc[(fold_id == i_fold)[0]].index
+        tr_idx, va_idx = self.load_index_fold(i_fold)
         X_tr, y_tr = X_train.iloc[tr_idx], y_train.iloc[tr_idx]
         X_val, y_val = X_train.iloc[va_idx], y_train.iloc[va_idx]
 
@@ -58,6 +60,8 @@ class Runner:
             score = log_loss(y_val, pred_val, eps=1e-15, normalize=True)
         elif self.evaluation_metric == 'mean_absolute_error':
             score = mean_absolute_error(y_val, pred_val)
+        elif self.evaluation_metric == 'rmse':
+            score = np.sqrt(mean_squared_error(y_val, pred_val))
         elif self.evaluation_metric == 'auc':
             score = roc_auc_score(y_val, pred_val)
 
@@ -76,7 +80,7 @@ class Runner:
         preds = []
 
         # 各foldで学習を行う
-        for i_fold in range(self.n_fold):
+        for i_fold in range(self.cv.n_splits):
             # 学習を行う
             logger.info(f'{self.run_name} fold {i_fold} - start training')
             model, va_idx, va_pred, score = self.train_fold(i_fold)
@@ -96,7 +100,16 @@ class Runner:
         preds = np.concatenate(preds, axis=0)
         preds = preds[order]
 
-        logger.info(f'{self.run_name} - end training cv - score {np.mean(scores)}')
+        if self.evaluation_metric == 'log_loss':
+            cv_score = log_loss(self.y_train, preds, eps=1e-15, normalize=True)
+        elif self.evaluation_metric == 'mean_absolute_error':
+            cv_score = mean_absolute_error(self.y_train, preds)
+        elif self.evaluation_metric == 'rmse':
+            cv_score = np.sqrt(mean_squared_error(self.y_train, preds))
+        elif self.evaluation_metric == 'auc':
+            cv_score = roc_auc_score(self.y_train, preds)
+
+        logger.info(f'{self.run_name} - end training cv - score {cv_score}')
 
         # 予測結果の保存
         Data.dump(preds, f'../output/pred/{self.run_name}-train.pkl')
@@ -118,7 +131,7 @@ class Runner:
             feature_importances = pd.DataFrame()
 
         # 各foldのモデルで予測を行う
-        for i_fold in range(self.n_fold):
+        for i_fold in range(self.cv.n_splits):
             logger.info(f'{self.run_name} - start prediction fold:{i_fold}')
             model = self.build_model(i_fold)
             model.load_model()
@@ -160,7 +173,25 @@ class Runner:
         """
         # ラン名、fold、モデルのクラスからモデルを作成する
         run_fold_name = f'{self.run_name}-{i_fold}'
-        return self.model_cls(run_fold_name, self.params, self.categorical_features)
+        return self.model_cls(run_fold_name, self.params, self.cols_definition['categorical_col'])
+
+    def load_index_fold(self, i_fold: int) -> np.array:
+        """クロスバリデーションでのfoldを指定して対応するレコードのインデックスを返す
+        :param i_fold: foldの番号
+        :return: foldに対応するレコードのインデックス
+        """
+        # 学習データ・バリデーションデータを分けるインデックスを返す
+        # ここでは乱数を固定して毎回作成しているが、ファイルに保存する方法もある
+        if 'cv_y' in self.cols_definition:
+            return list(self.cv.split(self.X_train, self.X_train[self.cols_definition['cv_y']]))[i_fold]
+        else:
+            return list(self.cv.split(self.X_train, self.y_train))[i_fold]
+
+    def submission(self):
+        pred = Data.load(f'../output/pred/{self.run_name}-test.pkl')
+        sub = pd.read_csv(self.sample_submission)
+        sub[self.cols_definition['target_col']] = pred
+        sub.to_csv(f'../output/submissions/submission_{self.run_name}.csv', index=False)
 
 
 class ResRunner:
