@@ -1,4 +1,5 @@
-exp_name: 'exp000'
+exp_name: 'petfinder-adoption-prediction'
+run_name: 'run000'
 fe_name: 'fe000'
 data:
   sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
@@ -19,8 +20,8 @@ cols_definition:
 model_name: 'ModelCatRegressor'
 params: {
   'depth': 6,
-  'learning_rate': 0.5,
-  'iterations': 1000,
+  'learning_rate': 0.1,
+  'iterations': 10,
   'loss_function': 'RMSE',
   'eval_metric': 'RMSE',
   'random_seed': 777,

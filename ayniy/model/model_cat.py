@@ -1,4 +1,5 @@
 import os
+
 import catboost as cb
 
 from ayniy.model.model import Model

@@ -1,7 +1,8 @@
-import pandas as pd
-import numpy as np
 from abc import ABCMeta, abstractmethod
 from typing import Optional
+
+import pandas as pd
+import numpy as np
 
 
 class Model(metaclass=ABCMeta):
