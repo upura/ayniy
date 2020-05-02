@@ -17,20 +17,20 @@ Quick Start Guide
 
    # Load configs
    f = open('configs/fe000.yml', 'r+')
-   feConfigs = yaml.load(f)
-   g = open('configs/exp000.yml', 'r+')
-   expConfigs = yaml.load(g)
+   fe_configs = yaml.load(f)
+   g = open('configs/run000.yml', 'r+')
+   run_configs = yaml.load(g)
 
    # CV strategy
    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
 
    # Feature engineering
-   tabular = Tabular(feConfigs, cv)
+   tabular = Tabular(fe_configs, cv)
    tabular.create()
    X_train, X_test, y_train = tabular.load()
 
    # Modeling
-   runner = Runner(expConfigs, cv)
+   runner = Runner(run_configs, cv)
    runner.run_train_cv()
    runner.run_predict_cv()
    runner.submission()
