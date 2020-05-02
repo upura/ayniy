@@ -11,8 +11,6 @@ from mlflow import log_metric, log_param
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
 from ayniy.model.model_cat import ModelCatRegressor
-
-
 logger = Logger()
 
 
@@ -30,6 +28,7 @@ class Runner:
         self.cols_definition = configs['cols_definition']
         self.cv = cv
         self.sample_submission = configs['data']['sample_submission']
+        self.advanced = configs['advanced']
 
         if configs['model_name']:
             self.model_cls = ModelCatRegressor
@@ -48,10 +47,22 @@ class Runner:
         X_train = self.X_train
         y_train = self.y_train
 
+        if 'ResRunner' in self.advanced:
+            oof = Data.load(self.advanced['ResRunner']['oof'])
+            X_train['res'] = (y_train - oof).abs()
+
         # 学習データ・バリデーションデータをセットする
         tr_idx, va_idx = self.load_index_fold(i_fold)
         X_tr, y_tr = X_train.iloc[tr_idx], y_train.iloc[tr_idx]
         X_val, y_val = X_train.iloc[va_idx], y_train.iloc[va_idx]
+
+        # 残差でダウンサンプリング
+        if 'ResRunner' in self.advanced:
+            X_tr = X_tr.loc[(X_tr['res'] < self.advanced['ResRunner']['res_threshold']).values]
+            y_tr = y_tr.loc[(X_tr['res'] < self.advanced['ResRunner']['res_threshold']).values]
+            print(X_tr.shape)
+            X_tr.drop('res', axis=1, inplace=True)
+            X_val.drop('res', axis=1, inplace=True)
 
         # 学習を行う
         model = self.build_model(i_fold)
@@ -207,6 +218,9 @@ class Runner:
         sub = pd.read_csv(self.sample_submission)
         sub[self.cols_definition['target_col']] = pred
         sub.to_csv(f'../output/submissions/submission_{self.run_name}.csv', index=False)
+
+    def reset_mlflow(self):
+        mlflow.end_run()
 
 
 class ResRunner:
