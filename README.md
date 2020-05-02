@@ -16,6 +16,13 @@ docker-compose up
 - Change url `6caefe97b41d` to `localhost`
 - ref: [Dockerでデータ分析環境を手軽に作る方法](https://amalog.hateblo.jp/entry/data-analysis-docker)
 
+## MLflow
+
+```
+cd experiments
+mlflow ui
+```
+
 ## Test
 
 ```
@@ -23,12 +30,9 @@ docker-compose build
 docker-compose up -d
 docker exec -it ayniy-test bash
 ```
-
-## MLflow
-
 ```
-cd experiments
-mlflow ui
+cd tests
+pytest --cov=. --cov-report=html
 ```
 
 ## Docs
@@ -40,7 +44,6 @@ docker exec -it ayniy-test bash
 cd docs
 make html
 ```
-
 ```
 cd docs/build/html
 git a .
