@@ -24,6 +24,13 @@ docker-compose up -d
 docker exec -it ayniy-test bash
 ```
 
+## MLflow
+
+```
+cd experiments
+mlflow ui
+```
+
 ## Docs
 
 ```
