@@ -13,6 +13,7 @@ from sklearn.feature_extraction.text import _document_frequency
 from sklearn.utils.validation import check_is_fitted
 from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
 import torch
+from torch.utils.data import DataLoader
 
 
 def analyzer_bow_en(text):
@@ -215,7 +216,7 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
 def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
     """
     col_definition: text_col
-    option: n_components, lang={'ja', 'en'}
+    option: n_components, lang={'ja', 'en'}, batch_size
     """
 
     n_train = len(train)
@@ -240,15 +241,15 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     else:
         raise ValueError
 
-    batch_size = 10
     X = []
-    for i in tqdm(range(-1 * (-1 * n_train // batch_size)), leave=False):
-        encoded_data = tokenizer.batch_encode_plus(
-            list(train[col_definition['text_col']].fillna('').values)[i * batch_size: (i + 1) * batch_size],
-            pad_to_max_length=True,
-            add_special_tokens=True)
-        input_ids = torch.tensor(encoded_data['input_ids'])
-        outputs = model(input_ids)
+    encoded_data = tokenizer.batch_encode_plus(
+        list(train[col_definition['text_col']].fillna('').values),
+        pad_to_max_length=True,
+        add_special_tokens=True)
+    input_ids = torch.tensor(encoded_data['input_ids'])
+    loader = DataLoader(input_ids, batch_size=option['batch_size'], shuffle=False)
+    for x in tqdm(loader, leave=False):
+        outputs = model(x)
         X.append(outputs[0][:, 0, :])
     X = torch.cat(X)
     X = X.detach().numpy()
