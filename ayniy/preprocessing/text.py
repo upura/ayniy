@@ -242,6 +242,8 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
         raise ValueError
 
     X = []
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
     encoded_data = tokenizer.batch_encode_plus(
         list(train[col_definition['text_col']].fillna('').values),
         pad_to_max_length=True,
@@ -249,10 +251,11 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     input_ids = torch.tensor(encoded_data['input_ids'])
     loader = DataLoader(input_ids, batch_size=option['batch_size'], shuffle=False)
     for x in tqdm(loader, leave=False):
+        x = x.to(device)
         outputs = model(x)
         X.append(outputs[0][:, 0, :])
     X = torch.cat(X)
-    X = X.detach().numpy()
+    X = X.detach().cpu().numpy()
     X = vectorizer.fit_transform(X).astype(np.float32)
 
     X = pd.DataFrame(X, columns=[
