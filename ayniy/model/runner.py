@@ -1,8 +1,8 @@
+from typing import Callable, Union
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error
-from typing import Callable
-from typing import Union
 import matplotlib.pyplot as plt
 import seaborn as sns
 

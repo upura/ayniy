@@ -1,8 +1,8 @@
+from collections import defaultdict, Counter
+
 import random
 import numpy as np
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import GroupKFold
-from collections import defaultdict, Counter
+from sklearn.model_selection import StratifiedKFold, GroupKFold
 from sklearn.utils import check_random_state
 
 

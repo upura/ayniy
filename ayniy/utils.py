@@ -3,6 +3,8 @@ import os
 import datetime
 import logging
 import time
+from contextlib import contextmanager
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score
@@ -10,7 +12,6 @@ from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 from typing import Union
 from sklearn.externals import joblib
-from contextlib import contextmanager
 from IPython.core.display import display, HTML
 import torch
 

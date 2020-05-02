@@ -1,13 +1,15 @@
 import warnings
+import itertools
+from os.path import join
+
 import pandas as pd
 import numpy as np
 from sklearn import preprocessing
-from os.path import join
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation, TruncatedSVD
 from sklearn.decomposition import PCA
-import itertools
 from kaggler.preprocessing import TargetEncoder
+
 from ayniy.utils import Data
 
 

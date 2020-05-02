@@ -1,14 +1,15 @@
+import re
+
 import numpy as np
 import pandas as pd
-import re
+import scipy as sp
+import nltk
 from tqdm import tqdm_notebook as tqdm
 import neologdn
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.decomposition import TruncatedSVD, NMF
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
-import scipy as sp
-import nltk
 from sklearn.feature_extraction.text import _document_frequency
 from sklearn.utils.validation import check_is_fitted
 from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
