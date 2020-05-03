@@ -15,18 +15,19 @@ parser.add_argument('--fe')
 parser.add_argument('--run')
 args = parser.parse_args()
 
-f = open(args.fe, 'r+')
-fe_configs = yaml.load(f)
-g = open(args.run, 'r+')
-run_configs = yaml.load(g)
-
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
 
 if args.fe:
+    f = open(args.fe, 'r+')
+    fe_configs = yaml.load(f)
+
     tabular = Tabular(fe_configs, cv)
     tabular.create()
 
 if args.run:
+    g = open(args.run, 'r+')
+    run_configs = yaml.load(g)
+
     runner = Runner(run_configs, cv)
     runner.run_train_cv()
     runner.run_predict_cv()

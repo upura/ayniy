@@ -1,4 +1,5 @@
 import os
+import json
 
 import pandas as pd
 import numpy as np
@@ -95,7 +96,8 @@ class ModelOptunaLGBM(Model):
                 tuning_history=tuning_history
             )
         print('Best Params:', best_params)
-        print('Tuning history:', tuning_history)
+        with open(f'../output/model/{self.run_fold_name}_best_params.json', 'w') as f:
+            json.dump(best_params, f, indent=4, separators=(',', ': '))
 
     def predict(self, te_x):
         return self.model.predict(te_x, num_iteration=self.model.best_iteration)

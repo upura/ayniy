@@ -1,0 +1,40 @@
+description: LightGBM Optuna
+exp_name: 'petfinder-adoption-prediction'
+run_name: 'run005'
+fe_name: 'fe000'
+data:
+  sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
+cols_definition:
+  id_col: 'PetID'
+  target_col: 'AdoptionSpeed'
+  categorical_col: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
+model_name: 'ModelOptunaLGBM'
+params: {
+  'objective': 'regression',
+  'metric': 'rmse',
+  'num_leaves': 14,
+  'max_depth': 6,
+  "feature_fraction": 0.8,
+  'subsample_freq': 1,
+  "bagging_fraction": 0.7,
+  'min_data_in_leaf': 10,
+  'learning_rate': 0.1,
+  "boosting": "gbdt",
+  "lambda_l1": 0.4,
+  "lambda_l2": 0.4,
+  "verbosity": -1,
+  "random_state": 42,
+  "num_boost_round": 10,
+  "early_stopping_rounds": 100
+}
+evaluation_metric: 'rmse'
