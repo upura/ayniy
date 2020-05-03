@@ -10,10 +10,26 @@ from mlflow import log_metric, log_param, log_artifact
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
+from ayniy.model.model_lgbm import ModelLGBM, ModelOptunaLGBM, ModelFocalLGBM
 from ayniy.model.model_cat import ModelCatRegressor
-from ayniy.model.model_lgbm import ModelLGBM
+from ayniy.model.model_xgb import ModelXGB
+from ayniy.model.model_ngb import ModelNgbClassifier, ModelNgbRegressor
+from ayniy.model.model_nn import ModelTNNClassifier, ModelTNNRegressor
+from ayniy.model.model_ridge import ModelRIDGE
 
 logger = Logger()
+models_map = {
+    'ModelLGBM': ModelLGBM,
+    'ModelOptunaLGBM': ModelOptunaLGBM,
+    'ModelFocalLGBM': ModelFocalLGBM,
+    'ModelCatRegressor': ModelCatRegressor,
+    'ModelXGB': ModelXGB,
+    'ModelNgbClassifier': ModelNgbClassifier,
+    'ModelNgbRegressor': ModelNgbRegressor,
+    'ModelTNNClassifier': ModelTNNClassifier,
+    'ModelTNNRegressor': ModelTNNRegressor,
+    'ModelRIDGE': ModelRIDGE
+}
 
 
 class Runner:
@@ -34,10 +50,8 @@ class Runner:
         self.description = configs['description']
         self.advanced = configs['advanced'] if 'advanced' in configs else None
 
-        if configs['model_name'] == 'ModelLGBM':
-            self.model_cls = ModelLGBM
-        elif configs['model_name'] == 'ModelCatRegressor':
-            self.model_cls = ModelCatRegressor
+        if configs['model_name'] in models_map.keys():
+            self.model_cls = models_map[configs['model_name']]
         else:
             raise ValueError
 

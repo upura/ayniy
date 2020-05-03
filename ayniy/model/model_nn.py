@@ -19,6 +19,10 @@ import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
+def rmse(y, y_pred):
+    return K.sqrt(K.mean(K.square(y - y_pred)))
+
+
 def get_keras_data(df, numerical_features, categorical_features):
     X = {
         "numerical": df[numerical_features].values
@@ -108,7 +112,7 @@ def se_block(input, channels, r=8):
     return Multiply()([input, x])
 
 
-class ModelTNN(oriModel):
+class ModelTNNRegressor(oriModel):
 
     def train(self, tr_x, tr_y, va_x=None, va_y=None, te_x=None):
 
@@ -145,14 +149,14 @@ class ModelTNN(oriModel):
         x = se_block(x, 32 + 4)
         x = BatchNormalization()(x)
         x = Dropout(dropout / 2)(x)
-        # x = Dense(1000, activation="relu")(x)
-        # x = Dense(800, activation="relu")(x)
-        # x = Dense(300, activation="relu")(x)
-        out = Dense(1, activation="sigmoid", name="out1")(x)
+        x = Dense(1000, activation="relu")(x)
+        x = Dense(800, activation="relu")(x)
+        x = Dense(300, activation="relu")(x)
+        out = Dense(1, activation="linear", name="out1")(x)
 
         model = kerasModel(inputs=inp_cats + [inp_numerical], outputs=out)
-        model.compile(loss='binary_crossentropy', optimizer='adam')
-
+        # model.compile(loss='mean_absolute_error', optimizer='adam')
+        model.compile(loss=rmse, optimizer='adam')
         # print(model.summary())
         n_train = len(tr_x)
         batch_size_nn = 256
@@ -178,7 +182,90 @@ class ModelTNN(oriModel):
     def predict(self, te_x):
         numerical_features = [c for c in te_x.columns if c not in self.categorical_features]
         te_x = get_keras_data(te_x, numerical_features, self.categorical_features)
-        pred = self.model.predict(te_x)
+        pred = self.model.predict(te_x).reshape(-1, )
+        return pred
+
+    def save_model(self):
+        model_path = os.path.join('../output/model', f'{self.run_fold_name}.h5')
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        self.model.save(model_path)
+
+    def load_model(self):
+        model_path = os.path.join('../output/model', f'{self.run_fold_name}.h5')
+        # self.model = load_model(model_path)
+        self.model = load_model(model_path, custom_objects={'rmse': rmse})
+
+
+class ModelTNNClassifier(oriModel):
+
+    def train(self, tr_x, tr_y, va_x=None, va_y=None, te_x=None):
+
+        # データのセット・スケーリング
+        numerical_features = [c for c in tr_x.columns if c not in self.categorical_features]
+        validation = va_x is not None
+
+        # パラメータ
+        dropout = self.params['dropout']
+        nb_epoch = self.params['nb_epoch']
+        patience = self.params['patience']
+
+        # モデルの構築
+        inp_cats = []
+        embs = []
+        data = pd.concat([tr_x, va_x, te_x]).reset_index(drop=True)
+
+        for c in self.categorical_features:
+            inp_cat = Input(shape=[1], name=c)
+            inp_cats.append(inp_cat)
+            embs.append((Embedding(data[c].max() + 1, 4)(inp_cat)))
+        cats = Flatten()(concatenate(embs))
+        cats = Dense(4, activation="linear")(cats)
+        cats = BatchNormalization()(cats)
+        cats = PReLU()(cats)
+
+        inp_numerical = Input(shape=[len(numerical_features)], name="numerical")
+        nums = Dense(32, activation="linear")(inp_numerical)
+        nums = BatchNormalization()(nums)
+        nums = PReLU()(nums)
+        nums = Dropout(dropout)(nums)
+
+        x = concatenate([nums, cats])
+        x = se_block(x, 32 + 4)
+        x = BatchNormalization()(x)
+        x = Dropout(dropout / 2)(x)
+        x = Dense(1000, activation="relu")(x)
+        x = Dense(800, activation="relu")(x)
+        x = Dense(300, activation="relu")(x)
+        out = Dense(1, activation="sigmoid", name="out1")(x)
+
+        model = kerasModel(inputs=inp_cats + [inp_numerical], outputs=out)
+        model.compile(loss='binary_crossentropy', optimizer='adam')
+        # print(model.summary())
+        n_train = len(tr_x)
+        batch_size_nn = 256
+
+        tr_x = get_keras_data(tr_x, numerical_features, self.categorical_features)
+        va_x = get_keras_data(va_x, numerical_features, self.categorical_features)
+
+        clr_tri = CyclicLR(base_lr=1e-5, max_lr=1e-2, step_size=n_train // batch_size_nn, mode="triangular2")
+        ckpt = ModelCheckpoint(f'../output/model/model_{self.run_fold_name}.hdf5', save_best_only=True,
+                               monitor='val_loss', mode='min')
+        if validation:
+            early_stopping = EarlyStopping(monitor='val_loss', patience=patience,
+                                           verbose=1, restore_best_weights=True)
+            model.fit(tr_x, tr_y, epochs=nb_epoch, batch_size=batch_size_nn, verbose=2,
+                      validation_data=(va_x, va_y), callbacks=[ckpt, clr_tri, early_stopping])
+        else:
+            model.fit(tr_x, tr_y, nb_epoch=nb_epoch, batch_size=batch_size_nn, verbose=2)
+        model.load_weights(f'../output/model/model_{self.run_fold_name}.hdf5')
+
+        # モデル・スケーラーの保持
+        self.model = model
+
+    def predict(self, te_x):
+        numerical_features = [c for c in te_x.columns if c not in self.categorical_features]
+        te_x = get_keras_data(te_x, numerical_features, self.categorical_features)
+        pred = self.model.predict(te_x).reshape(-1, )
         return pred
 
     def save_model(self):

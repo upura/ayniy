@@ -1,0 +1,35 @@
+description: XGBoost
+exp_name: 'petfinder-adoption-prediction'
+run_name: 'run007'
+fe_name: 'fe000'
+data:
+  sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
+cols_definition:
+  id_col: 'PetID'
+  target_col: 'AdoptionSpeed'
+  categorical_col: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
+model_name: 'ModelXGB'
+params: {
+  'eval_metric': 'rmse',
+  'max_depth': 5,
+  'learning_rate': 0.05,
+  'min_child_weight': 10,
+  'subsample': 0.8,
+  'colsample_bytree': 0.7,
+  'seed': 1337,
+  'verbosity': 0,
+  'random_state': 71,
+  'num_round': 30,
+  'early_stopping_rounds': 50,
+}
+evaluation_metric: 'rmse'
