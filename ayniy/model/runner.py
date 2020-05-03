@@ -33,9 +33,9 @@ class Runner:
         self.sample_submission = configs['data']['sample_submission']
         self.advanced = configs['advanced'] if 'advanced' in configs else None
 
-        if configs['model_name']:
+        if configs['model_name'] == 'ModelLGBM':
             self.model_cls = ModelLGBM
-        elif configs['model_name']:
+        elif configs['model_name'] == 'ModelCatRegressor':
             self.model_cls = ModelCatRegressor
         else:
             raise ValueError
