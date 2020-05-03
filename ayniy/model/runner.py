@@ -12,13 +12,15 @@ from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
 from ayniy.model.model_lgbm import ModelLGBM, ModelOptunaLGBM, ModelFocalLGBM
 from ayniy.model.model_cat import ModelCatRegressor
+from ayniy.model.model_xgb import ModelXGB
 
 logger = Logger()
 models_map = {
     'ModelLGBM': ModelLGBM,
     'ModelOptunaLGBM': ModelOptunaLGBM,
     'ModelFocalLGBM': ModelFocalLGBM,
-    'ModelCatRegressor': ModelCatRegressor
+    'ModelCatRegressor': ModelCatRegressor,
+    'ModelXGB': ModelXGB
 }
 
 
