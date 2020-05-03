@@ -6,11 +6,13 @@ from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_s
 import matplotlib.pyplot as plt
 import seaborn as sns
 import mlflow
-from mlflow import log_metric, log_param
+from mlflow import log_metric, log_param, log_artifact
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
 from ayniy.model.model_cat import ModelCatRegressor
+from ayniy.model.model_lgbm import ModelLGBM
+
 logger = Logger()
 
 
@@ -19,6 +21,7 @@ class Runner:
     def __init__(self, configs: dict, cv):
         self.exp_name = configs['exp_name']
         self.run_name = configs['run_name']
+        self.run_id = None
         self.fe_name = configs['fe_name']
         self.X_train = Data.load(f"../input/X_train_{configs['fe_name']}.pkl")
         self.y_train = Data.load(f"../input/y_train_{configs['fe_name']}.pkl")
@@ -28,9 +31,11 @@ class Runner:
         self.cols_definition = configs['cols_definition']
         self.cv = cv
         self.sample_submission = configs['data']['sample_submission']
-        self.advanced = configs['advanced']
+        self.advanced = configs['advanced'] if 'advanced' in configs else None
 
         if configs['model_name']:
+            self.model_cls = ModelLGBM
+        elif configs['model_name']:
             self.model_cls = ModelCatRegressor
         else:
             raise ValueError
@@ -47,7 +52,7 @@ class Runner:
         X_train = self.X_train
         y_train = self.y_train
 
-        if 'ResRunner' in self.advanced:
+        if self.advanced and 'ResRunner' in self.advanced:
             oof = Data.load(self.advanced['ResRunner']['oof'])
             X_train['res'] = (y_train - oof).abs()
 
@@ -57,7 +62,7 @@ class Runner:
         X_val, y_val = X_train.iloc[va_idx], y_train.iloc[va_idx]
 
         # 残差でダウンサンプリング
-        if 'ResRunner' in self.advanced:
+        if self.advanced and 'ResRunner' in self.advanced:
             X_tr = X_tr.loc[(X_tr['res'] < self.advanced['ResRunner']['res_threshold']).values]
             y_tr = y_tr.loc[(X_tr['res'] < self.advanced['ResRunner']['res_threshold']).values]
             print(X_tr.shape)
@@ -65,7 +70,7 @@ class Runner:
             X_val.drop('res', axis=1, inplace=True)
 
         # Pseudo Lebeling
-        if 'PseudoRunner' in self.advanced:
+        if self.advanced and 'PseudoRunner' in self.advanced:
             y_test_pred = Data.load(self.advanced['PseudoRunner']['y_test_pred'])
             if self.advanced['PseudoRunner']['pl_threshold']:
                 X_add = self.X_test.loc[
@@ -149,6 +154,7 @@ class Runner:
         Data.dump(preds, f'../output/pred/{self.run_name}-train.pkl')
 
         # mlflow
+        self.run_id = mlflow.active_run().info.run_id
         log_param('model_name', str(self.model_cls).split('.')[-1][:-2])
         log_param('fe_name', self.fe_name)
         log_param('train_params', self.params)
@@ -164,7 +170,7 @@ class Runner:
 
         あらかじめrun_train_cvを実行しておく必要がある
         """
-        show_feature_importance = ('lgbm' in self.run_name)
+        show_feature_importance = 'LGBM' in str(self.model_cls)
 
         logger.info(f'{self.run_name} - start prediction cv')
         X_test = self.X_test
@@ -206,6 +212,11 @@ class Runner:
             plt.tight_layout()
             plt.savefig(f'../output/importance/{self.run_name}-fi.png')
             plt.show()
+
+            # mlflow
+            mlflow.start_run(run_id=self.run_id)
+            log_artifact(f'../output/importance/{self.run_name}-fi.png')
+            mlflow.end_run()
 
     def build_model(self, i_fold: Union[int, str]) -> Model:
         """クロスバリデーションでのfoldを指定して、モデルの作成を行う
