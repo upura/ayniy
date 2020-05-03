@@ -1,6 +1,6 @@
-description: Ridge
+description: NGBoost
 exp_name: 'petfinder-adoption-prediction'
-run_name: 'run009'
+run_name: 'run010'
 fe_name: 'fe000'
 data:
   sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
@@ -18,9 +18,17 @@ cols_definition:
     'State',
     'RescuerID'
   ]
-model_name: 'ModelRIDGE'
+model_name: 'ModelNgbRegressor'
 params: {
-  'alpha': 100,
-  'random_state': 0
+  'n_estimators': 10000,
+  'learning_rate': 0.2,
+  'minibatch_frac': 0.7,
+  'col_sample': 1.0,
+  'verbose': True,
+  'verbose_eval': 10,
+  'random_state': 7,
+  'natural_gradient': False,
+  'tol': 1e-4,
+  'early_stopping_rounds': 50
 }
 evaluation_metric: 'rmse'
