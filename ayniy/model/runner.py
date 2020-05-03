@@ -10,13 +10,14 @@ from mlflow import log_metric, log_param, log_artifact
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
-from ayniy.model.model_lgbm import ModelLGBM, ModelOptunaLGBM
+from ayniy.model.model_lgbm import ModelLGBM, ModelOptunaLGBM, ModelFocalLGBM
 from ayniy.model.model_cat import ModelCatRegressor
 
 logger = Logger()
 models_map = {
     'ModelLGBM': ModelLGBM,
     'ModelOptunaLGBM': ModelOptunaLGBM,
+    'ModelFocalLGBM': ModelFocalLGBM,
     'ModelCatRegressor': ModelCatRegressor
 }
 
