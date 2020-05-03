@@ -1,0 +1,27 @@
+description: TNN
+exp_name: 'petfinder-adoption-prediction'
+run_name: 'run008'
+fe_name: 'fe000'
+data:
+  sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
+cols_definition:
+  id_col: 'PetID'
+  target_col: 'AdoptionSpeed'
+  categorical_col: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
+model_name: 'ModelTNNRegressor'
+params: {
+  'nb_epoch': 10,
+  'patience': 10,
+  'dropout': 0.3,
+}
+evaluation_metric: 'rmse'
