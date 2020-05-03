@@ -1,4 +1,4 @@
-# CatBoost Regressor with ResRunner
+description: CatBoost Regressor with ResRunner
 exp_name: 'petfinder-adoption-prediction'
 run_name: 'run001'
 fe_name: 'fe000'

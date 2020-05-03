@@ -31,6 +31,7 @@ class Runner:
         self.cols_definition = configs['cols_definition']
         self.cv = cv
         self.sample_submission = configs['data']['sample_submission']
+        self.description = configs['description']
         self.advanced = configs['advanced'] if 'advanced' in configs else None
 
         if configs['model_name'] == 'ModelLGBM':
@@ -177,6 +178,7 @@ class Runner:
         log_metric('cv_score', cv_score)
         log_param('fold_scores', dict(zip([f'fold_{i}' for i in range(len(scores))], [round(s, 4) for s in scores])))
         log_param('cols_definition', self.cols_definition)
+        log_param('description', self.description)
         mlflow.end_run()
 
     def run_predict_cv(self) -> None:

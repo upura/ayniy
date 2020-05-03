@@ -1,4 +1,4 @@
-# Adversarial validation
+description: Adversarial validation
 exp_name: 'petfinder-adoption-prediction'
 run_name: 'run004'
 fe_name: 'fe000'

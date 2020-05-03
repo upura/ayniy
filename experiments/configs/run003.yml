@@ -1,4 +1,4 @@
-# LightGBM
+description: LightGBM
 exp_name: 'petfinder-adoption-prediction'
 run_name: 'run003'
 fe_name: 'fe000'
