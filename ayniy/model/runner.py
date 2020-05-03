@@ -52,6 +52,7 @@ class Runner:
         X_train = self.X_train
         y_train = self.y_train
 
+        # 残差の設定
         if self.advanced and 'ResRunner' in self.advanced:
             oof = Data.load(self.advanced['ResRunner']['oof'])
             X_train['res'] = (y_train - oof).abs()
@@ -117,6 +118,18 @@ class Runner:
         scores = []
         va_idxes = []
         preds = []
+
+        # Adversarial validation
+        if self.advanced and 'adversarial_validation' in self.advanced:
+            X_train = self.X_train
+            X_test = self.X_test
+            X_train['target'] = 0
+            X_test['target'] = 1
+            X_train = pd.concat([X_train, X_test], sort=False).reset_index(drop=True)
+            y_train = X_train['target']
+            X_train.drop('target', axis=1, inplace=True)
+            self.X_train = X_train
+            self.y_train = y_train
 
         # 各foldで学習を行う
         for i_fold in range(self.cv.n_splits):
