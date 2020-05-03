@@ -128,6 +128,7 @@ class Runner:
             X_train = pd.concat([X_train, X_test], sort=False).reset_index(drop=True)
             y_train = X_train['target']
             X_train.drop('target', axis=1, inplace=True)
+            X_test.drop('target', axis=1, inplace=True)
             self.X_train = X_train
             self.y_train = y_train
 
@@ -183,11 +184,12 @@ class Runner:
 
         あらかじめrun_train_cvを実行しておく必要がある
         """
-        show_feature_importance = 'LGBM' in str(self.model_cls)
 
         logger.info(f'{self.run_name} - start prediction cv')
         X_test = self.X_test
         preds = []
+
+        show_feature_importance = 'LGBM' in str(self.model_cls)
         if show_feature_importance:
             feature_importances = pd.DataFrame()
 
