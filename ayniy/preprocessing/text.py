@@ -17,6 +17,8 @@ from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
 import torch
 from torch.utils.data import DataLoader
 
+from ayniy.preprocessing.mecab import create_parsed_document
+
 
 def analyzer_bow_en(text):
     sb = nltk.stem.snowball.SnowballStemmer('english')
@@ -164,6 +166,8 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
 
     if option['lang'] == 'en':
         X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
+    elif option['lang'] == 'ja':
+        X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
@@ -202,6 +206,8 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
 
     if option['lang'] == 'en':
         X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
+    elif option['lang'] == 'ja':
+        X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
