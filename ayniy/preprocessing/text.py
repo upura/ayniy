@@ -6,6 +6,7 @@ import scipy as sp
 import nltk
 from tqdm import tqdm_notebook as tqdm
 import neologdn
+import spacy
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.decomposition import TruncatedSVD, NMF
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -207,6 +208,42 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     X = pd.DataFrame(X, columns=[
         'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
         'count_nmf_{}'.format(i) for i in range(option['n_components'])] + [
+        'count_bm25_{}'.format(i) for i in range(option['n_components'])])
+    train = pd.concat([train, X], axis=1)
+    test = train[n_train:].reset_index(drop=True)
+    train = train[:n_train]
+    return train, test
+
+
+def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+    """
+    col_definition: text_col
+    option: n_components, lang={'ja', 'en'}
+    """
+    n_train = len(train)
+    train = pd.concat([train, test], sort=False).reset_index(drop=True)
+    vectorizer = make_pipeline(
+        make_union(
+            TruncatedSVD(n_components=option['n_components'], random_state=7),
+            make_pipeline(
+                BM25Transformer(use_idf=True, k1=2.0, b=0.75),
+                TruncatedSVD(n_components=option['n_components'], random_state=7)
+            ),
+            n_jobs=1,
+        ),
+    )
+
+    if option['lang'] == 'en':
+        pass
+    elif option['lang'] == 'ja':
+        nlp = spacy.load('ja_ginza')
+        docs = list(nlp.pipe(train[col_definition['text_col']].fillna('')))
+        X = [d.vector for d in docs]
+    else:
+        raise ValueError
+    X = vectorizer.fit_transform(X).astype(np.float32)
+    X = pd.DataFrame(X, columns=[
+        'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
         'count_bm25_{}'.format(i) for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)

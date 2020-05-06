@@ -1,4 +1,5 @@
 git+https://github.com/stanfordmlgroup/ngboost.git
+ginza
 fastprogress
 japanize-matplotlib
 joblib==0.13.2
