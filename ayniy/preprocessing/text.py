@@ -237,14 +237,14 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
         pass
     elif option['lang'] == 'ja':
         nlp = spacy.load('ja_ginza')
-        docs = list(nlp.pipe(train[col_definition['text_col']].fillna('')))
+        docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
         X = [d.vector for d in docs]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
-        'count_bm25_{}'.format(i) for i in range(option['n_components'])])
+        'swem_mean_svd_{}'.format(i) for i in range(option['n_components'])] + [
+        'swem_mean_bm25_{}'.format(i) for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
