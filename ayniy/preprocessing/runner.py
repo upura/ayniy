@@ -16,7 +16,10 @@ from ayniy.preprocessing.tabular import (count_null,
                                          delete_cols,
                                          detect_delete_cols,
                                          save_as_pickle)
-from ayniy.preprocessing.text import get_tfidf, get_count, get_bert
+from ayniy.preprocessing.text import (get_tfidf,
+                                      get_count,
+                                      get_bert,
+                                      get_swem_mean)
 from ayniy.utils import Data
 
 
@@ -95,6 +98,14 @@ class Tabular:
                     self.train, self.test = get_count(self.train, self.test,
                                                       {'text_col': tc},
                                                       self.preprocessing['get_count'])
+
+        if 'get_swem_mean' in self.preprocessing.keys():
+            with timer('get_swem_mean'):
+                for tc in self.cols_definition['text_col']:
+                    self.train, self.test = get_swem_mean(self.train, self.test,
+                                                          {'text_col': tc},
+                                                          self.preprocessing['get_swem_mean'])
+
         if 'get_bert' in self.preprocessing.keys():
             with timer('get_bert'):
                 for tc in self.cols_definition['text_col']:

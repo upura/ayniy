@@ -136,13 +136,12 @@ class BM25Transformer(BaseEstimator, TransformerMixin):
         return X
 
 
-def text_normalize(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def text_normalize(train: pd.DataFrame, col_definition: dict):
     """
     col_definition: text_col
     """
     train[col_definition['text_col']] = train[col_definition['text_col']].apply(neologdn.normalize)
-    test[col_definition['text_col']] = test[col_definition['text_col']].apply(neologdn.normalize)
-    return train, test
+    return train
 
 
 def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
@@ -168,6 +167,7 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     if option['lang'] == 'en':
         X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
     elif option['lang'] == 'ja':
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
         X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
     else:
         raise ValueError
@@ -208,6 +208,7 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     if option['lang'] == 'en':
         X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
     elif option['lang'] == 'ja':
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
         X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
     else:
         raise ValueError
@@ -250,6 +251,7 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
             nlp.vocab[word]
             nlp.vocab.set_vector(word, wv[word])
 
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
         docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
         X = [d.vector for d in docs]
     else:
@@ -289,6 +291,7 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     elif option['lang'] == 'ja':
         tokenizer = BertJapaneseTokenizer.from_pretrained('bert-base-japanese')
         model = BertModel.from_pretrained('bert-base-japanese')
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
     else:
         raise ValueError
 
