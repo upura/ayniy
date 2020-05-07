@@ -5,6 +5,7 @@ import pandas as pd
 import scipy as sp
 import nltk
 from tqdm import tqdm_notebook as tqdm
+from gensim.models import KeyedVectors
 import neologdn
 import spacy
 from sklearn.pipeline import make_pipeline, make_union
@@ -242,7 +243,13 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
     if option['lang'] == 'en':
         pass
     elif option['lang'] == 'ja':
+        wv = KeyedVectors.load_word2vec_format('../ayniy/pretrained/model.vec', binary=False)
         nlp = spacy.load('ja_ginza')
+        nlp.vocab.reset_vectors(width=wv.vectors.shape[1])
+        for word in wv.vocab.keys():
+            nlp.vocab[word]
+            nlp.vocab.set_vector(word, wv[word])
+
         docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
         X = [d.vector for d in docs]
     else:
