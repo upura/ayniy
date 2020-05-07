@@ -11,5 +11,5 @@ cols_definition:
 preprocessing:
   get_tfidf: {'n_components': 5, 'lang': 'ja'}
   get_count: {'n_components': 5, 'lang': 'ja'}
-  get_swem_mean: {'n_components': 5, 'lang': 'ja'}
-  get_bert: {'n_components': 5, 'lang': 'ja'}
+  # get_swem_mean: {'n_components': 5, 'lang': 'ja'}
+  # get_bert: {'n_components': 5, 'lang': 'ja'}
