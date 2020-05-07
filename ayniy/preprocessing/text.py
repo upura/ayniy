@@ -242,7 +242,7 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
     )
 
     if option['lang'] == 'en':
-        pass
+        nlp = spacy.load('en_core_web_sm')
     elif option['lang'] == 'ja':
         wv = KeyedVectors.load_word2vec_format('../ayniy/pretrained/model.vec', binary=False)
         nlp = spacy.load('ja_ginza')
@@ -252,10 +252,10 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
             nlp.vocab.set_vector(word, wv[word])
 
         train = text_normalize(train, {'text_col': col_definition['text_col']})
-        docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
-        X = [d.vector for d in docs]
     else:
         raise ValueError
+    docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
+    X = [d.vector for d in docs]
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
         'swem_mean_svd_{}'.format(i) for i in range(option['n_components'])] + [
