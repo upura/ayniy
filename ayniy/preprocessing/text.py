@@ -5,7 +5,9 @@ import pandas as pd
 import scipy as sp
 import nltk
 from tqdm import tqdm_notebook as tqdm
+from gensim.models import KeyedVectors
 import neologdn
+import spacy
 from sklearn.pipeline import make_pipeline, make_union
 from sklearn.decomposition import TruncatedSVD, NMF
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -15,6 +17,8 @@ from sklearn.utils.validation import check_is_fitted
 from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
 import torch
 from torch.utils.data import DataLoader
+
+from ayniy.preprocessing.mecab import create_parsed_document
 
 
 def analyzer_bow_en(text):
@@ -132,13 +136,12 @@ class BM25Transformer(BaseEstimator, TransformerMixin):
         return X
 
 
-def text_normalize(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def text_normalize(train: pd.DataFrame, col_definition: dict):
     """
     col_definition: text_col
     """
     train[col_definition['text_col']] = train[col_definition['text_col']].apply(neologdn.normalize)
-    test[col_definition['text_col']] = test[col_definition['text_col']].apply(neologdn.normalize)
-    return train, test
+    return train
 
 
 def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
@@ -163,6 +166,9 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
 
     if option['lang'] == 'en':
         X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
+    elif option['lang'] == 'ja':
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
+        X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
@@ -201,6 +207,9 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
 
     if option['lang'] == 'en':
         X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
+    elif option['lang'] == 'ja':
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
+        X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
@@ -208,6 +217,49 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
         'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
         'count_nmf_{}'.format(i) for i in range(option['n_components'])] + [
         'count_bm25_{}'.format(i) for i in range(option['n_components'])])
+    train = pd.concat([train, X], axis=1)
+    test = train[n_train:].reset_index(drop=True)
+    train = train[:n_train]
+    return train, test
+
+
+def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+    """
+    col_definition: text_col
+    option: n_components, lang={'ja', 'en'}
+    """
+    n_train = len(train)
+    train = pd.concat([train, test], sort=False).reset_index(drop=True)
+    vectorizer = make_pipeline(
+        make_union(
+            TruncatedSVD(n_components=option['n_components'], random_state=7),
+            make_pipeline(
+                BM25Transformer(use_idf=True, k1=2.0, b=0.75),
+                TruncatedSVD(n_components=option['n_components'], random_state=7)
+            ),
+            n_jobs=1,
+        ),
+    )
+
+    if option['lang'] == 'en':
+        pass
+    elif option['lang'] == 'ja':
+        wv = KeyedVectors.load_word2vec_format('../ayniy/pretrained/model.vec', binary=False)
+        nlp = spacy.load('ja_ginza')
+        nlp.vocab.reset_vectors(width=wv.vectors.shape[1])
+        for word in wv.vocab.keys():
+            nlp.vocab[word]
+            nlp.vocab.set_vector(word, wv[word])
+
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
+        docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
+        X = [d.vector for d in docs]
+    else:
+        raise ValueError
+    X = vectorizer.fit_transform(X).astype(np.float32)
+    X = pd.DataFrame(X, columns=[
+        'swem_mean_svd_{}'.format(i) for i in range(option['n_components'])] + [
+        'swem_mean_bm25_{}'.format(i) for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
@@ -239,6 +291,7 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     elif option['lang'] == 'ja':
         tokenizer = BertJapaneseTokenizer.from_pretrained('bert-base-japanese')
         model = BertModel.from_pretrained('bert-base-japanese')
+        train = text_normalize(train, {'text_col': col_definition['text_col']})
     else:
         raise ValueError
 
