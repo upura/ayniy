@@ -39,4 +39,4 @@ params: {
 }
 evaluation_metric: 'rmse'
 advanced:
-  target_sqrt:
+  predict_exp:

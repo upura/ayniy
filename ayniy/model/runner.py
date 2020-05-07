@@ -274,7 +274,10 @@ class Runner:
     def submission(self):
         pred = Data.load(f'../output/pred/{self.run_name}-test.pkl')
         sub = pd.read_csv(self.sample_submission)
-        sub[self.cols_definition['target_col']] = pred
+        if self.advanced and 'predict_exp' in self.advanced:
+            sub[self.cols_definition['target_col']] = np.exp(pred)
+        else:
+            sub[self.cols_definition['target_col']] = pred
         sub.to_csv(f'../output/submissions/submission_{self.run_name}.csv', index=False)
 
     def reset_mlflow(self):
