@@ -17,7 +17,7 @@ def use_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     """
     col_definition: encode_col, target_col
     """
-    train = train[col_definition['encode_col'] + col_definition['target_col']]
+    train = train[col_definition['encode_col'] + [col_definition['target_col']]]
     test = test[col_definition['encode_col']]
     return train, test
 
