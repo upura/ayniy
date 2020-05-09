@@ -1,6 +1,4 @@
 git+https://github.com/stanfordmlgroup/ngboost.git
-https://github.com/PKSHATechnology-Research/camphr_models/releases/download/0.5/ja_mecab_udify-0.5.tar.gz
-camphr
 fastprogress
 ginza
 japanize-matplotlib
