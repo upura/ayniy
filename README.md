@@ -52,9 +52,8 @@ docker-compose build
 docker-compose up -d
 docker exec -it ayniy-test bash
 ```
-```
-cd tests
-pytest --cov=. --cov-report=html
+``` 
+pytest tests/ --cov=. --cov-report=html
 ```
 
 ## Docs
