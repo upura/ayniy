@@ -17,7 +17,7 @@ def use_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     """
     col_definition: encode_col, target_col
     """
-    train = train[col_definition['encode_col'] + col_definition['target_col']]
+    train = train[col_definition['encode_col'] + [col_definition['target_col']]]
     test = test[col_definition['encode_col']]
     return train, test
 
@@ -369,11 +369,6 @@ def matrix_factorization(train: pd.DataFrame, test: pd.DataFrame, col_definition
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
     return train, test
-
-
-def pca_df(df, hidden_dims):
-    pca_clf = PCA(n_components=hidden_dims)
-    return pca_clf.fit_transform(df)
 
 
 def target_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
