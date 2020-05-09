@@ -7,7 +7,6 @@ import numpy as np
 from sklearn import preprocessing
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation, TruncatedSVD
-from sklearn.decomposition import PCA
 from kaggler.preprocessing import TargetEncoder
 
 from ayniy.utils import Data
