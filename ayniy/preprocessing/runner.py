@@ -3,24 +3,23 @@ from os.path import join
 import pandas as pd
 import numpy as np
 
-from ayniy.utils import timer
-from ayniy.preprocessing.tabular import (count_null,
-                                         label_encoding,
-                                         frequency_encoding,
-                                         count_encoding,
-                                         count_encoding_interact,
-                                         matrix_factorization,
-                                         target_encoding,
-                                         aggregation,
-                                         numeric_interact,
-                                         delete_cols,
-                                         detect_delete_cols,
-                                         save_as_pickle)
-from ayniy.preprocessing.text import (get_tfidf,
-                                      get_count,
-                                      get_bert,
-                                      get_swem_mean)
-from ayniy.utils import Data
+from ayniy.utils import timer, Data
+from ayniy.preprocessing import (count_null,
+                                 label_encoding,
+                                 frequency_encoding,
+                                 count_encoding,
+                                 count_encoding_interact,
+                                 matrix_factorization,
+                                 target_encoding,
+                                 aggregation,
+                                 numeric_interact,
+                                 delete_cols,
+                                 detect_delete_cols,
+                                 save_as_pickle,
+                                 get_tfidf,
+                                 get_count,
+                                 get_bert,
+                                 get_swem_mean)
 
 
 class Tabular:
