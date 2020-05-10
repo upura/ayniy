@@ -1,19 +1,18 @@
-import random
-import os
+from contextlib import contextmanager
 import datetime
 import logging
+import os
+import random
 import time
-from contextlib import contextmanager
+from typing import Union
 
+from IPython.core.display import display, HTML
 import numpy as np
 import pandas as pd
-from sklearn.metrics import f1_score
-from sklearn.metrics import accuracy_score
-from tqdm import tqdm
-from typing import Union
+from sklearn.metrics import f1_score, accuracy_score
 from sklearn.externals import joblib
-from IPython.core.display import display, HTML
 import torch
+from tqdm import tqdm
 
 
 def seed_everything(seed=777):

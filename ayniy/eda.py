@@ -1,10 +1,10 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib_venn import venn2
-from sklearn.utils.multiclass import unique_labels
-from sklearn.metrics import confusion_matrix
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
 
 sns.set(style="ticks", color_codes=True)
 

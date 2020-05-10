@@ -1,22 +1,21 @@
 import re
 
+from gensim.models import KeyedVectors
+import neologdn
+import nltk
 import numpy as np
 import pandas as pd
 import scipy as sp
-import nltk
-from tqdm import tqdm_notebook as tqdm
-from gensim.models import KeyedVectors
-import neologdn
-import spacy
-from sklearn.pipeline import make_pipeline, make_union
-from sklearn.decomposition import TruncatedSVD, NMF
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_extraction.text import _document_frequency
+from sklearn.decomposition import TruncatedSVD, NMF
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, _document_frequency
+from sklearn.pipeline import make_pipeline, make_union
 from sklearn.utils.validation import check_is_fitted
-from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
+import spacy
 import torch
 from torch.utils.data import DataLoader
+from tqdm import tqdm_notebook as tqdm
+from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
 
 from ayniy.preprocessing.mecab import create_parsed_document
 

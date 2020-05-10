@@ -1,13 +1,13 @@
-import warnings
 import itertools
 from os.path import join
+import warnings
 
-import pandas as pd
-import numpy as np
-from sklearn import preprocessing
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation, TruncatedSVD
 from kaggler.preprocessing import TargetEncoder
+import numpy as np
+import pandas as pd
+from sklearn import preprocessing
+from sklearn.decomposition import LatentDirichletAllocation, TruncatedSVD
+from sklearn.feature_extraction.text import CountVectorizer
 
 from ayniy.utils import Data
 

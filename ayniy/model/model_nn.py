@@ -1,7 +1,5 @@
 import os
 
-import numpy as np
-import pandas as pd
 from keras import backend as K
 from keras.callbacks import EarlyStopping, Callback, ModelCheckpoint
 from keras.layers.advanced_activations import PReLU
@@ -10,12 +8,14 @@ from keras.layers import Input, Embedding, Flatten, concatenate, Multiply, Conv1
 from keras.layers.normalization import BatchNormalization
 from keras.models import load_model
 from keras.models import Model as kerasModel
+import numpy as np
+import pandas as pd
+import tensorflow as tf
 
 from ayniy.model.model import Model as oriModel
 
 # tensorflowの警告抑制
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-import tensorflow as tf
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 

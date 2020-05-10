@@ -1,12 +1,12 @@
 from typing import Union
 
-import numpy as np
-import pandas as pd
-from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error
 import matplotlib.pyplot as plt
-import seaborn as sns
 import mlflow
 from mlflow import log_metric, log_param, log_artifact
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
