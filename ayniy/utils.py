@@ -3,6 +3,7 @@ import datetime
 import logging
 import os
 import random
+import sys
 import time
 from typing import Union
 
@@ -184,7 +185,7 @@ class Logger:
     def __init__(self):
         self.general_logger = logging.getLogger('general')
         self.result_logger = logging.getLogger('result')
-        stream_handler = logging.StreamHandler()
+        stream_handler = logging.StreamHandler(stream=sys.stdout)
         file_general_handler = logging.FileHandler('../output/logs/general.log')
         file_result_handler = logging.FileHandler('../output/logs/result.log')
         if len(self.general_logger.handlers) == 0:
