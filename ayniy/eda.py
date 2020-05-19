@@ -22,6 +22,7 @@ def pairplot(df):
 
 def plot_null(df):
     sns.heatmap(df.isnull(), cbar=False)
+    plt.show()
 
 
 def plot_confusion_matrix(y_true, y_pred, classes,
