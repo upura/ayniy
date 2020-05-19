@@ -1,3 +1,7 @@
+import os
+import datetime
+
+import pandas as pd
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
@@ -10,14 +14,14 @@ from ayniy.preprocessing import (count_null,
                                  target_encoding,
                                  aggregation,
                                  numeric_interact,
+                                 standerize,
+                                 fillna,
+                                 datatime_parser,
+                                 circle_encoding,
+                                 use_cols,
                                  delete_cols,
                                  detect_delete_cols,
-                                 save_as_pickle,
-                                 get_tfidf,
-                                 get_count,
-                                 get_bert,
-                                 get_swem_mean,
-                                 use_cols)
+                                 save_as_pickle)
 
 
 def test_use_cols(load_titanic):
@@ -100,3 +104,112 @@ def test_target_encoding(load_titanic):
                                {'encode_col': encode_col, 'target_col': target_col},
                                {'cv': cv})
     assert train[prefix + encode_col[0]].dtype == np.float64
+
+
+def test_standerize(load_titanic):
+    train, test = load_titanic
+    encode_col = ['age', 'fare']
+    train, _ = standerize(train, test, {'encode_col': encode_col})
+    SMALL_ENOUGH = 0.000001
+    assert np.mean(train['age']) < SMALL_ENOUGH
+    assert 1 - np.std(train['age']) < SMALL_ENOUGH
+
+
+def test_fillna(load_titanic):
+    train, test = load_titanic
+    train, _ = fillna(train, test,
+                      {'encode_col': ['age']},
+                      {'how': 'median'})
+    train, _ = fillna(train, test,
+                      {'encode_col': ['fare']},
+                      {'how': 'mean'})
+    assert train['age'].isnull().sum() == 0
+    assert train['fare'].isnull().sum() == 0
+
+
+def test_datatime_parser(load_titanic):
+    train, test = load_titanic
+    train['now'] = datetime.datetime.now()
+    test['now'] = datetime.datetime.now()
+    train_new, _ = datatime_parser(train, test, {'encode_col': ['now']})
+    assert len((set(train_new.columns) - set(train.columns))) > 0
+
+
+def test_circle_encoding(load_titanic):
+    train = pd.DataFrame({'numbers': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]})
+    test = train.copy()
+    train_new, _ = circle_encoding(train, test, {'encode_col': ['numbers']})
+    assert len((set(train_new.columns) - set(train.columns))) == 2
+
+
+def test_matrix_factorization(load_titanic):
+    train, test = load_titanic
+    encode_col = ['pclass', 'sibsp']
+    n_components_lda = 3
+    n_components_svd = 4
+    train_new, _ = matrix_factorization(train, test,
+                                        {'encode_col': encode_col},
+                                        {'n_components_lda': n_components_lda, 'n_components_svd': n_components_svd})
+    assert len((set(train_new.columns) - set(train.columns))) > 0
+
+
+def test_aggregation(load_titanic):
+    train, test = load_titanic
+    groupby_dict = [
+        {
+            'key': ['pclass'],
+            'var': ['age', 'fare'],
+            'agg': ['mean', 'sum', 'median', 'min', 'max', 'var', 'std']
+        },
+    ]
+    nunique_dict = [
+        {
+            'key': ['pclass'],
+            'var': ['sibsp'],
+            'agg': ['nunique']
+        },
+    ]
+    train_new, _ = aggregation(train, test,
+                               {'groupby_dict': groupby_dict, 'nunique_dict': nunique_dict})
+    assert len((set(train_new.columns) - set(train.columns))) > 0
+
+
+def test_detect_delete_cols(load_titanic):
+    train, test = load_titanic
+    escape_col = ['sex', 'class', 'who', 'adult_male', 'deck', 'embark_town', 'alive', 'alone']
+    unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(
+        train, test, {'escape_col': escape_col}, {'threshold': 0.1})
+    assert type(unique_cols) == list
+    assert type(duplicated_cols) == list
+    assert type(high_corr_cols) == list
+
+
+def test_save_as_pickle(load_titanic):
+    train, test = load_titanic
+    exp_id = 'pytest'
+    output_dir = 'input'
+    save_as_pickle(train, test,
+                   {'target_col': 'survived'},
+                   {'output_dir': output_dir, 'exp_id': exp_id})
+    assert os.path.exists(f'{output_dir}/X_train_{exp_id}.pkl')
+    assert os.path.exists(f'{output_dir}/y_train_{exp_id}.pkl')
+    assert os.path.exists(f'{output_dir}/X_test_{exp_id}.pkl')
+    os.remove(f'{output_dir}/X_train_{exp_id}.pkl')
+    os.remove(f'{output_dir}/y_train_{exp_id}.pkl')
+    os.remove(f'{output_dir}/X_test_{exp_id}.pkl')
+
+
+def test_save_as_pickle_test_exclude_target(load_titanic):
+    train, test = load_titanic
+    test.drop('survived', axis=1, inplace=True)
+    exp_id = 'pytest'
+    output_dir = 'input'
+    save_as_pickle(train, test,
+                   {'target_col': 'survived'},
+                   {'output_dir': output_dir, 'exp_id': exp_id})
+    assert os.path.exists(f'{output_dir}/X_train_{exp_id}.pkl')
+    assert os.path.exists(f'{output_dir}/y_train_{exp_id}.pkl')
+    assert os.path.exists(f'{output_dir}/X_test_{exp_id}.pkl')
+    os.remove(f'{output_dir}/X_train_{exp_id}.pkl')
+    os.remove(f'{output_dir}/y_train_{exp_id}.pkl')
+    os.remove(f'{output_dir}/X_test_{exp_id}.pkl')
