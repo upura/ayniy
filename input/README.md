@@ -1,2 +1,4 @@
-# PetFinder.my Adoption Prediction
-https://www.kaggle.com/c/petfinder-adoption-prediction
+# input
+
+- [livedoor-news-corpus](https://www.rondhuit.com/download.html)
+- [petfinder-adoption-prediction](https://www.kaggle.com/c/petfinder-adoption-prediction)
