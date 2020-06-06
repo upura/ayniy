@@ -13,7 +13,7 @@ def get_long_description():
 
 
 def get_version():
-    version_filepath = path.join(path.dirname(__file__), 'nyaggle', 'version.py')
+    version_filepath = path.join(path.dirname(__file__), 'ayniy', 'version.py')
     with open(version_filepath) as f:
         for line in f:
             if line.startswith('__version__'):
