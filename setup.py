@@ -29,7 +29,6 @@ setup(
     license='MIT',
 
     install_requires=[
-        'git+https://github.com/stanfordmlgroup/ngboost.git'
         'ginza',
         'japanize-matplotlib',
         'matplotlib',
