@@ -2,7 +2,7 @@
 
 Ayniy is a supporting tool for machine learning competitions.
 
-[**Documentation**](https://upura.github.io/ayniy-docs/) | [**Slide (Japanese)**](https://speakerdeck.com/upura/introduction-ayniy)
+[**Documentation**](https://upura.github.io/ayniy-docs/) | [**Slide (Japanese)**](https://speakerdeck.com/upura/ayniy-with-mlflow)
 
 ```python
 # Import packages
