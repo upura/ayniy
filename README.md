@@ -2,7 +2,7 @@
 
 Ayniy is a supporting tool for machine learning competitions.
 
-[**Documentation**](https://upura.github.io/ayniy-docs/) | [**Slide (Japanese)**](https://speakerdeck.com/upura/introduction-ayniy)
+[**Documentation**](https://upura.github.io/ayniy-docs/) | [**Slide (Japanese)**](https://speakerdeck.com/upura/ayniy-with-mlflow)
 
 ```python
 # Import packages
@@ -34,8 +34,8 @@ runner.submission()
 ## Environment
 
 ```
-docker-compose build
-docker-compose up
+docker-compose -d --build
+docker exec -it ayniy-test bash
 ```
 
 ## MLflow
@@ -47,24 +47,18 @@ mlflow ui
 
 ## Test
 
-```
-docker-compose build
-docker-compose up -d
-docker exec -it ayniy-test bash
-```
 ``` 
 pytest tests/ --cov=. --cov-report=html
 ```
 
 ## Docs
-
+In container,
 ```
-docker-compose build
-docker-compose up -d
-docker exec -it ayniy-test bash
 cd docs
 make html
 ```
+
+Out of container,
 ```
 cd docs/build/html
 git a .

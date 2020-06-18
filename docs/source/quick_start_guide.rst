@@ -3,12 +3,6 @@ Quick Start Guide
 
 .. code-block:: python
 
-   # Notebook settings
-   from ayniy.utils import init_notebook
-   init_notebook()
-   %load_ext autoreload
-   %autoreload 2
-
    # Import packages
    import yaml
    from sklearn.model_selection import StratifiedKFold
@@ -27,7 +21,7 @@ Quick Start Guide
    # Feature engineering
    tabular = Tabular(fe_configs, cv)
    tabular.create()
-   X_train, X_test, y_train = tabular.load()
+   # X_train, X_test, y_train = tabular.load()
 
    # Modeling
    runner = Runner(run_configs, cv)

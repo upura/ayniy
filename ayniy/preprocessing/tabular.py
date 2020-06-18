@@ -77,14 +77,9 @@ def standerize(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     col_definition: encode_col
     """
     scaler = preprocessing.StandardScaler()
-
-    if col_definition['encode_col'] is None:
-        train = scaler.fit_transform(train)
-        test = scaler.transform(test)
-    else:
-        train[col_definition['encode_col']] = scaler.fit_transform(train[col_definition['encode_col']])
-        test[col_definition['encode_col']] = scaler.transform(test[col_definition['encode_col']])
-    return pd.DataFrame(train), pd.DataFrame(test)
+    train[col_definition['encode_col']] = scaler.fit_transform(train[col_definition['encode_col']])
+    test[col_definition['encode_col']] = scaler.transform(test[col_definition['encode_col']])
+    return train, test
 
 
 def fillna(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
@@ -106,37 +101,42 @@ def datatime_parser(train: pd.DataFrame, test: pd.DataFrame, col_definition: dic
     """
     col_definition: encode_col
     """
-    train['year'] = pd.to_datetime(train[col_definition['encode_col']]).dt.year
-    train['month'] = pd.to_datetime(train[col_definition['encode_col']]).dt.month
-    train['day'] = pd.to_datetime(train[col_definition['encode_col']]).dt.day
-    train['dow'] = pd.to_datetime(train[col_definition['encode_col']]).dt.dayofweek
-    train['hour'] = pd.to_datetime(train[col_definition['encode_col']]).dt.hour
-    train['minute'] = pd.to_datetime(train[col_definition['encode_col']]).dt.minute
-    test['year'] = pd.to_datetime(test[col_definition['encode_col']]).dt.year
-    test['month'] = pd.to_datetime(test[col_definition['encode_col']]).dt.month
-    test['day'] = pd.to_datetime(test[col_definition['encode_col']]).dt.day
-    test['dow'] = pd.to_datetime(test[col_definition['encode_col']]).dt.dayofweek
-    test['hour'] = pd.to_datetime(test[col_definition['encode_col']]).dt.hour
-    test['minute'] = pd.to_datetime(test[col_definition['encode_col']]).dt.minute
-    return train, test
+    _train = train.copy()
+    _test = test.copy()
+    for f in col_definition['encode_col']:
+        _train[f + '_year'] = pd.to_datetime(train[f]).dt.year
+        _train[f + '_month'] = pd.to_datetime(train[f]).dt.month
+        _train[f + '_day'] = pd.to_datetime(train[f]).dt.day
+        _train[f + '_dow'] = pd.to_datetime(train[f]).dt.dayofweek
+        _train[f + '_hour'] = pd.to_datetime(train[f]).dt.hour
+        _train[f + '_minute'] = pd.to_datetime(train[f]).dt.minute
+        _test[f + '_year'] = pd.to_datetime(test[f]).dt.year
+        _test[f + '_month'] = pd.to_datetime(test[f]).dt.month
+        _test[f + '_day'] = pd.to_datetime(test[f]).dt.day
+        _test[f + '_dow'] = pd.to_datetime(test[f]).dt.dayofweek
+        _test[f + '_hour'] = pd.to_datetime(test[f]).dt.hour
+        _test[f + '_minute'] = pd.to_datetime(test[f]).dt.minute
+    return _train, _test
 
 
 def circle_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     """
     col_definition: encode_col
     """
+    _train = train.copy()
+    _test = test.copy()
     for f in col_definition['encode_col']:
-        train[f + '_cos'] = np.cos(2 * np.pi * train[f] / train[f].max())
-        train[f + '_sin'] = np.sin(2 * np.pi * train[f] / train[f].max())
-        test[f + '_cos'] = np.cos(2 * np.pi * test[f] / train[f].max())
-        test[f + '_sin'] = np.sin(2 * np.pi * test[f] / train[f].max())
-    return train, test
+        _train[f + '_cos'] = np.cos(2 * np.pi * train[f] / train[f].max())
+        _train[f + '_sin'] = np.sin(2 * np.pi * train[f] / train[f].max())
+        _test[f + '_cos'] = np.cos(2 * np.pi * test[f] / train[f].max())
+        _test[f + '_sin'] = np.sin(2 * np.pi * test[f] / train[f].max())
+    return _train, _test
 
 
 def save_as_pickle(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
     """
     col_definition: target_col
-    option: exp_id
+    option: output_dir, exp_id
     """
     X_train = train.drop(col_definition['target_col'], axis=1)
     y_train = train[col_definition['target_col']]

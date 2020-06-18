@@ -6,15 +6,15 @@ from mlflow import log_metric, log_param, log_artifact
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error
+from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error, average_precision_score
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
 from ayniy.model import (ModelLGBM, ModelOptunaLGBM, ModelFocalLGBM,
-                         ModelCatRegressor,
+                         ModelCatRegressor, ModelCatClassifier,
                          ModelXGB,
                          ModelNgbClassifier, ModelNgbRegressor,
-                         ModelTNNClassifier, ModelTNNRegressor,
+                         ModelTNNClassifier, ModelTNNRegressor, ModelCNNClasifier, ModelRNNClasifier,
                          ModelRIDGE)
 
 
@@ -24,11 +24,14 @@ models_map = {
     'ModelOptunaLGBM': ModelOptunaLGBM,
     'ModelFocalLGBM': ModelFocalLGBM,
     'ModelCatRegressor': ModelCatRegressor,
+    'ModelCatClassifier': ModelCatClassifier,
     'ModelXGB': ModelXGB,
     'ModelNgbClassifier': ModelNgbClassifier,
     'ModelNgbRegressor': ModelNgbRegressor,
     'ModelTNNClassifier': ModelTNNClassifier,
     'ModelTNNRegressor': ModelTNNRegressor,
+    'ModelCNNClasifier': ModelCNNClasifier,
+    'ModelRNNClasifier': ModelRNNClasifier,
     'ModelRIDGE': ModelRIDGE
 }
 
@@ -89,11 +92,17 @@ class Runner:
         # Pseudo Lebeling
         if self.advanced and 'PseudoRunner' in self.advanced:
             y_test_pred = Data.load(self.advanced['PseudoRunner']['y_test_pred'])
-            if self.advanced['PseudoRunner']['pl_threshold']:
+            if 'pl_threshold' in self.advanced['PseudoRunner']:
                 X_add = self.X_test.loc[
                     (y_test_pred < self.advanced['PseudoRunner']['pl_threshold']) | (y_test_pred > 1 - self.advanced['PseudoRunner']['pl_threshold'])]
-                y_add = pd.DataFrame(self.y_test_pred).loc[
+                y_add = pd.DataFrame(y_test_pred).loc[
                     (y_test_pred < self.advanced['PseudoRunner']['pl_threshold']) | (y_test_pred > 1 - self.advanced['PseudoRunner']['pl_threshold'])]
+                y_add = pd.DataFrame(([1 if ya > 0.5 else 0 for ya in y_add[0]]))
+            elif 'pl_threshold_neg' in self.advanced['PseudoRunner']:
+                X_add = self.X_test.loc[
+                    (y_test_pred < self.advanced['PseudoRunner']['pl_threshold_neg']) | (y_test_pred > self.advanced['PseudoRunner']['pl_threshold_pos'])]
+                y_add = pd.DataFrame(y_test_pred).loc[
+                    (y_test_pred < self.advanced['PseudoRunner']['pl_threshold_neg']) | (y_test_pred > self.advanced['PseudoRunner']['pl_threshold_pos'])]
                 y_add = pd.DataFrame(([1 if ya > 0.5 else 0 for ya in y_add[0]]))
             else:
                 X_add = self.X_test
@@ -117,6 +126,8 @@ class Runner:
             score = np.sqrt(mean_squared_error(y_val, pred_val))
         elif self.evaluation_metric == 'auc':
             score = roc_auc_score(y_val, pred_val)
+        elif self.evaluation_metric == 'prauc':
+            score = average_precision_score(y_val, pred_val)
 
         # モデル、インデックス、予測値、評価を返す
         return model, va_idx, pred_val, score
@@ -177,6 +188,8 @@ class Runner:
             cv_score = np.sqrt(mean_squared_error(self.y_train, preds))
         elif self.evaluation_metric == 'auc':
             cv_score = roc_auc_score(self.y_train, preds)
+        elif self.evaluation_metric == 'prauc':
+            cv_score = average_precision_score(self.y_train, preds)
 
         logger.info(f'{self.run_name} - end training cv - score {cv_score}')
 
@@ -234,8 +247,9 @@ class Runner:
 
         # 特徴量の重要度
         if show_feature_importance:
-            cols = feature_importances.groupby('Feature').mean().sort_values(by="importance", ascending=False)[:200].index
-            pd.DataFrame(cols).to_csv(f'../output/importance/{self.run_name}-fi.csv')
+            aggs = feature_importances.groupby('Feature').mean().sort_values(by="importance", ascending=False)
+            cols = aggs[:200].index
+            pd.DataFrame(aggs.index).to_csv(f'../output/importance/{self.run_name}-fi.csv', index=False)
 
             best_features = feature_importances.loc[feature_importances.Feature.isin(cols)]
             plt.figure(figsize=(14, 26))

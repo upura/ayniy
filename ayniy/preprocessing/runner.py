@@ -13,6 +13,7 @@ from ayniy.preprocessing import (count_null,
                                  target_encoding,
                                  aggregation,
                                  numeric_interact,
+                                 standerize,
                                  delete_cols,
                                  detect_delete_cols,
                                  save_as_pickle,
@@ -84,6 +85,10 @@ class Tabular:
             with timer('numeric_interact'):
                 self.train, self.test = numeric_interact(self.train, self.test, {'encode_col': self.cols_definition['numerical_col']})
 
+        if 'standerize' in self.preprocessing.keys():
+            with timer('standerize'):
+                self.train, self.test = standerize(self.train, self.test, {'encode_col': self.cols_definition['numerical_col']})
+
         if 'get_tfidf' in self.preprocessing.keys():
             with timer('get_tfidf'):
                 for tc in self.cols_definition['text_col']:
@@ -127,6 +132,7 @@ class Tabular:
                 {'encode_col': unique_cols + duplicated_cols + high_corr_cols + self.cols_definition['delete_col']})
 
         with timer('save'):
+            print('train.shape: ', self.train.shape)
             save_as_pickle(self.train, self.test,
                            {'target_col': self.cols_definition['target_col']},
                            {'exp_id': self.run_name, 'output_dir': self.output_dir})
