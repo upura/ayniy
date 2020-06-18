@@ -11,7 +11,7 @@ from IPython.core.display import display, HTML
 import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score, accuracy_score
-from sklearn.externals import joblib
+import joblib
 import torch
 from tqdm import tqdm
 
