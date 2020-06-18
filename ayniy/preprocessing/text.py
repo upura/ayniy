@@ -90,7 +90,7 @@ class BM25Transformer(BaseEstimator, TransformerMixin):
         X : sparse matrix, [n_samples, n_features] document-term matrix
         copy : boolean, optional (default=True)
         """
-        if hasattr(X, 'dtype') and np.issubdtype(X.dtype, np.float):
+        if hasattr(X, 'dtype') and np.issubdtype(X.dtype, np.floating):
             # preserve float family dtype
             X = sp.sparse.csr_matrix(X, copy=copy)
         else:
