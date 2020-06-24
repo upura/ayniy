@@ -198,7 +198,7 @@ class Runner:
 
         # mlflow
         self.run_id = mlflow.active_run().info.run_id
-        log_param('model_name', str(self.model_cls).split('.')[-1][:-2])
+        log_param('model_name', self.model_cls.__class__.__name__)
         log_param('fe_name', self.fe_name)
         log_param('train_params', self.params)
         log_param('cv_strategy', str(self.cv))
