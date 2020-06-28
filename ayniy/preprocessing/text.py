@@ -139,7 +139,7 @@ def text_normalize(train: pd.DataFrame, col_definition: dict):
     """
     col_definition: text_col
     """
-    train[col_definition['text_col']] = train[col_definition['text_col']].apply(neologdn.normalize)
+    train[col_definition['text_col']] = train[col_definition['text_col']].fillna('').apply(neologdn.normalize)
     return train
 
 
@@ -172,9 +172,9 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        'tfidf_svd_{}'.format(i) for i in range(option['n_components'])] + [
-        'tfidf_nmf_{}'.format(i) for i in range(option['n_components'])] + [
-        'tfidf_bm25_{}'.format(i) for i in range(option['n_components'])])
+        f'{col_definition["text_col"]}_tfidf_svd_{i}' for i in range(option['n_components'])] + [
+        f'{col_definition["text_col"]}_tfidf_nmf_{i}' for i in range(option['n_components'])] + [
+        f'{col_definition["text_col"]}_tfidf_bm25_{i}' for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
@@ -213,9 +213,9 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        'count_svd_{}'.format(i) for i in range(option['n_components'])] + [
-        'count_nmf_{}'.format(i) for i in range(option['n_components'])] + [
-        'count_bm25_{}'.format(i) for i in range(option['n_components'])])
+        f'{col_definition["text_col"]}_count_svd_{i}' for i in range(option['n_components'])] + [
+        f'{col_definition["text_col"]}_count_nmf_{i}' for i in range(option['n_components'])] + [
+        f'{col_definition["text_col"]}_count_bm25_{i}' for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
@@ -257,8 +257,8 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
     X = [d.vector for d in docs]
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        'swem_mean_svd_{}'.format(i) for i in range(option['n_components'])] + [
-        'swem_mean_bm25_{}'.format(i) for i in range(option['n_components'])])
+        f'{col_definition["text_col"]}_swem_mean_svd_{i}' for i in range(option['n_components'])] + [
+        f'{col_definition["text_col"]}_swem_mean_bm25_{i}' for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
@@ -312,8 +312,8 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     X = vectorizer.fit_transform(X).astype(np.float32)
 
     X = pd.DataFrame(X, columns=[
-        'bert_svd_{}'.format(i) for i in range(option['n_components'])] + [
-        'bert_bm25_{}'.format(i) for i in range(option['n_components'])])
+        f'{col_definition["text_col"]}_bert_svd_{i}' for i in range(option['n_components'])] + [
+        f'{col_definition["text_col"]}_bert_bm25_{i}' for i in range(option['n_components'])])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
