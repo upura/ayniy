@@ -13,9 +13,11 @@ from keras.models import Model as kerasModel
 import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score
+# from sklearn.preprocessing import QuantileTransformer
 import tensorflow as tf
 
 from ayniy.model.model import Model as oriModel
+from ayniy.preprocessing import standerize, fillna
 
 # tensorflowの警告抑制
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
@@ -30,9 +32,10 @@ def prauc(y, y_pred):
     return tf.py_func(average_precision_score, (y, y_pred), tf.double)
 
 
-def get_keras_data(df, numerical_features, audio_features):
+def get_keras_data(df, numerical_features, categorical_features):
     X = {"numerical": df[numerical_features].values}
-    X["audio"] = df[audio_features].values
+    for c in categorical_features:
+        X[c] = df[c]
     return X
 
 
@@ -138,6 +141,7 @@ class ModelTNNRegressor(oriModel):
             inp_cat = Input(shape=[1], name=c)
             inp_cats.append(inp_cat)
             embs.append((Embedding(data[c].max() + 1, 4)(inp_cat)))
+
         cats = Flatten()(concatenate(embs))
         cats = Dense(4, activation="linear")(cats)
         cats = BatchNormalization()(cats)
@@ -164,6 +168,13 @@ class ModelTNNRegressor(oriModel):
         # print(model.summary())
         n_train = len(tr_x)
         batch_size_nn = 256
+
+        # preprocessing
+        tr_x, va_x = standerize(tr_x, va_x, {'encode_col': numerical_features})
+        # prep = QuantileTransformer(output_distribution="normal")
+        # tr_x.loc[:, numerical_features] = prep.fit_transform(tr_x.loc[:, numerical_features])
+        # va_x.loc[:, numerical_features] = prep.transform(va_x.loc[:, numerical_features])
+        tr_x, va_x = fillna(tr_x, va_x, {'encode_col': tr_x.columns}, {'how': 'median'})
 
         tr_x = get_keras_data(tr_x, numerical_features, self.categorical_features)
         va_x = get_keras_data(va_x, numerical_features, self.categorical_features)
