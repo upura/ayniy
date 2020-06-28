@@ -31,6 +31,11 @@ runner.run_predict_cv()
 runner.submission()
 ```
 
+## Examples
+
+- [atmaCup #5](https://github.com/upura/atma-comp5)
+- [ProbSpace YouTube](https://github.com/upura/probspace-youtube)
+
 ## Environment
 
 ```
