@@ -1,4 +1,5 @@
 import re
+from typing import Tuple
 
 from gensim.models import KeyedVectors
 import neologdn
@@ -20,7 +21,7 @@ from transformers import BertTokenizer, BertJapaneseTokenizer, BertModel
 from ayniy.preprocessing.mecab import create_parsed_document
 
 
-def analyzer_bow_en(text):
+def analyzer_bow_en(text: str) -> str:
     sb = nltk.stem.snowball.SnowballStemmer('english')
     stop_words = ['i', 'a', 'an', 'the', 'to', 'and', 'or', 'if', 'is', 'are', 'am', 'it', 'this', 'that', 'of', 'from', 'in', 'on']
     text = text.lower()     # 小文字化
@@ -135,15 +136,20 @@ class BM25Transformer(BaseEstimator, TransformerMixin):
         return X
 
 
-def text_normalize(train: pd.DataFrame, col_definition: dict):
+def text_normalize(train: pd.DataFrame,
+                   text_col: str) -> pd.DataFrame:
     """
     col_definition: text_col
     """
-    train[col_definition['text_col']] = train[col_definition['text_col']].fillna('').apply(neologdn.normalize)
+    train[text_col] = train[text_col].fillna('').apply(neologdn.normalize)
     return train
 
 
-def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def get_tfidf(train: pd.DataFrame,
+              test: pd.DataFrame,
+              text_col: str,
+              n_components: int,
+              lang: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: text_col
     option: n_components, lang={'ja', 'en'}
@@ -153,35 +159,39 @@ def get_tfidf(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
     vectorizer = make_pipeline(
         TfidfVectorizer(),
         make_union(
-            TruncatedSVD(n_components=option['n_components'], random_state=7),
-            NMF(n_components=option['n_components'], random_state=7),
+            TruncatedSVD(n_components=n_components, random_state=7),
+            NMF(n_components=n_components, random_state=7),
             make_pipeline(
                 BM25Transformer(use_idf=True, k1=2.0, b=0.75),
-                TruncatedSVD(n_components=option['n_components'], random_state=7)
+                TruncatedSVD(n_components=n_components, random_state=7)
             ),
             n_jobs=1,
         ),
     )
 
-    if option['lang'] == 'en':
-        X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
-    elif option['lang'] == 'ja':
-        train = text_normalize(train, {'text_col': col_definition['text_col']})
-        X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
+    if lang == 'en':
+        X = [analyzer_bow_en(text) for text in train[text_col].fillna('')]
+    elif lang == 'ja':
+        train = text_normalize(train, text_col)
+        X = [' '.join(row) for row in create_parsed_document(train[text_col].fillna(''))]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        f'{col_definition["text_col"]}_tfidf_svd_{i}' for i in range(option['n_components'])] + [
-        f'{col_definition["text_col"]}_tfidf_nmf_{i}' for i in range(option['n_components'])] + [
-        f'{col_definition["text_col"]}_tfidf_bm25_{i}' for i in range(option['n_components'])])
+        f'{text_col}_tfidf_svd_{i}' for i in range(n_components)] + [
+        f'{text_col}_tfidf_nmf_{i}' for i in range(n_components)] + [
+        f'{text_col}_tfidf_bm25_{i}' for i in range(n_components)])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
     return train, test
 
 
-def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def get_count(train: pd.DataFrame,
+              test: pd.DataFrame,
+              text_col: str,
+              n_components: int,
+              lang: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: text_col
     option: n_components, lang={'ja', 'en'}
@@ -194,35 +204,39 @@ def get_count(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opt
                         strip_accents='unicode', analyzer='word', token_pattern=r'\w{1,}',
                         ngram_range=(1, 3), stop_words='english'),
         make_union(
-            TruncatedSVD(n_components=option['n_components'], random_state=7),
-            NMF(n_components=option['n_components'], random_state=7),
+            TruncatedSVD(n_components=n_components, random_state=7),
+            NMF(n_components=n_components, random_state=7),
             make_pipeline(
                 BM25Transformer(use_idf=True, k1=2.0, b=0.75),
-                TruncatedSVD(n_components=option['n_components'], random_state=7)
+                TruncatedSVD(n_components=n_components, random_state=7)
             ),
             n_jobs=1,
         ),
     )
 
-    if option['lang'] == 'en':
-        X = [analyzer_bow_en(text) for text in train[col_definition['text_col']].fillna('')]
-    elif option['lang'] == 'ja':
-        train = text_normalize(train, {'text_col': col_definition['text_col']})
-        X = [' '.join(row) for row in create_parsed_document(train[col_definition['text_col']].fillna(''))]
+    if lang == 'en':
+        X = [analyzer_bow_en(text) for text in train[text_col].fillna('')]
+    elif lang == 'ja':
+        train = text_normalize(train, text_col)
+        X = [' '.join(row) for row in create_parsed_document(train[text_col].fillna(''))]
     else:
         raise ValueError
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        f'{col_definition["text_col"]}_count_svd_{i}' for i in range(option['n_components'])] + [
-        f'{col_definition["text_col"]}_count_nmf_{i}' for i in range(option['n_components'])] + [
-        f'{col_definition["text_col"]}_count_bm25_{i}' for i in range(option['n_components'])])
+        f'{text_col}_count_svd_{i}' for i in range(n_components)] + [
+        f'{text_col}_count_nmf_{i}' for i in range(n_components)] + [
+        f'{text_col}_count_bm25_{i}' for i in range(n_components)])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
     return train, test
 
 
-def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def get_swem_mean(train: pd.DataFrame,
+                  test: pd.DataFrame,
+                  text_col: str,
+                  n_components: int,
+                  lang: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: text_col
     option: n_components, lang={'ja', 'en'}
@@ -231,18 +245,18 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
     vectorizer = make_pipeline(
         make_union(
-            TruncatedSVD(n_components=option['n_components'], random_state=7),
+            TruncatedSVD(n_components=n_components, random_state=7),
             make_pipeline(
                 BM25Transformer(use_idf=True, k1=2.0, b=0.75),
-                TruncatedSVD(n_components=option['n_components'], random_state=7)
+                TruncatedSVD(n_components=n_components, random_state=7)
             ),
             n_jobs=1,
         ),
     )
 
-    if option['lang'] == 'en':
+    if lang == 'en':
         nlp = spacy.load('en_core_web_sm')
-    elif option['lang'] == 'ja':
+    elif lang == 'ja':
         wv = KeyedVectors.load_word2vec_format('../ayniy/pretrained/model.vec', binary=False)
         nlp = spacy.load('ja_ginza')
         nlp.vocab.reset_vectors(width=wv.vectors.shape[1])
@@ -250,22 +264,27 @@ def get_swem_mean(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict,
             nlp.vocab[word]
             nlp.vocab.set_vector(word, wv[word])
 
-        train = text_normalize(train, {'text_col': col_definition['text_col']})
+        train = text_normalize(train, text_col)
     else:
         raise ValueError
-    docs = list(nlp.pipe(train[col_definition['text_col']].fillna(''), disable=['ner']))
+    docs = list(nlp.pipe(train[text_col].fillna(''), disable=['ner']))
     X = [d.vector for d in docs]
     X = vectorizer.fit_transform(X).astype(np.float32)
     X = pd.DataFrame(X, columns=[
-        f'{col_definition["text_col"]}_swem_mean_svd_{i}' for i in range(option['n_components'])] + [
-        f'{col_definition["text_col"]}_swem_mean_bm25_{i}' for i in range(option['n_components'])])
+        f'{text_col}_swem_mean_svd_{i}' for i in range(n_components)] + [
+        f'{text_col}_swem_mean_bm25_{i}' for i in range(n_components)])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
     return train, test
 
 
-def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def get_bert(train: pd.DataFrame,
+             test: pd.DataFrame,
+             text_col: str,
+             n_components: int,
+             lang: str,
+             batch_size: int = 64) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: text_col
     option: n_components, lang={'ja', 'en'}, batch_size
@@ -275,22 +294,22 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
     vectorizer = make_pipeline(
         make_union(
-            TruncatedSVD(n_components=option['n_components'], random_state=7),
+            TruncatedSVD(n_components=n_components, random_state=7),
             make_pipeline(
                 BM25Transformer(use_idf=True, k1=2.0, b=0.75),
-                TruncatedSVD(n_components=option['n_components'], random_state=7)
+                TruncatedSVD(n_components=n_components, random_state=7)
             ),
             n_jobs=1,
         ),
     )
 
-    if option['lang'] == 'en':
+    if lang == 'en':
         tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         model = BertModel.from_pretrained('bert-base-uncased')
-    elif option['lang'] == 'ja':
+    elif lang == 'ja':
         tokenizer = BertJapaneseTokenizer.from_pretrained('bert-base-japanese')
         model = BertModel.from_pretrained('bert-base-japanese')
-        train = text_normalize(train, {'text_col': col_definition['text_col']})
+        train = text_normalize(train, text_col)
     else:
         raise ValueError
 
@@ -298,11 +317,11 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
     encoded_data = tokenizer.batch_encode_plus(
-        list(train[col_definition['text_col']].fillna('').values),
+        list(train[text_col].fillna('').values),
         pad_to_max_length=True,
         add_special_tokens=True)
     input_ids = torch.tensor(encoded_data['input_ids'])
-    loader = DataLoader(input_ids, batch_size=option['batch_size'], shuffle=False)
+    loader = DataLoader(input_ids, batch_size=batch_size, shuffle=False)
     for x in tqdm(loader, leave=False):
         x = x.to(device)
         outputs = model(x)
@@ -312,8 +331,8 @@ def get_bert(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, opti
     X = vectorizer.fit_transform(X).astype(np.float32)
 
     X = pd.DataFrame(X, columns=[
-        f'{col_definition["text_col"]}_bert_svd_{i}' for i in range(option['n_components'])] + [
-        f'{col_definition["text_col"]}_bert_bm25_{i}' for i in range(option['n_components'])])
+        f'{text_col}_bert_svd_{i}' for i in range(n_components)] + [
+        f'{text_col}_bert_bm25_{i}' for i in range(n_components)])
     train = pd.concat([train, X], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
