@@ -2,7 +2,6 @@ import os
 import datetime
 
 import pandas as pd
-import pytest
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
@@ -95,7 +94,6 @@ def test_numeric_interact(load_titanic):
         assert train[f'{encode_col[0]}{c}{encode_col[1]}'].dtype == np.float64
 
 
-@pytest.mark.skip
 def test_target_encoding(load_titanic):
     train, test = load_titanic
     encode_col = ['embarked', 'sex']

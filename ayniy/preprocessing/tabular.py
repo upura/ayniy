@@ -412,7 +412,7 @@ def target_encoding(train: pd.DataFrame,
     """
     warnings.simplefilter('ignore')
 
-    te = TargetEncoder(cv)
+    te = TargetEncoder(cv=cv)
 
     train_fe = te.fit_transform(train[encode_col], train[target_col])
     train_fe.columns = ['te_' + c for c in train_fe.columns]
