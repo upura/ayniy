@@ -17,8 +17,16 @@ def use_cols(train: pd.DataFrame,
              test: pd.DataFrame,
              encode_col: List[str],
              target_col: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col, target_col
+    """Select columns
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+        target_col (str): target column
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     train = train[encode_col + [target_col]]
     test = test[encode_col]
@@ -29,9 +37,16 @@ def detect_delete_cols(train: pd.DataFrame,
                        test: pd.DataFrame,
                        escape_col: List[str],
                        threshold: float) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: escape_col
-    option: threshold
+    """Detect unnecessary columns for deleting
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        escape_col (List[str]): columns not encoded
+        threshold (float): deleting threshold for correlations of columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     unique_cols = list(train.columns[train.nunique() == 1])
     duplicated_cols = list(train.columns[train.T.duplicated()])
@@ -56,8 +71,15 @@ def detect_delete_cols(train: pd.DataFrame,
 def delete_cols(train: pd.DataFrame,
                 test: pd.DataFrame,
                 encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Delete columns
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     train.drop(encode_col, inplace=True, axis=1)
     test.drop(encode_col, inplace=True, axis=1)
@@ -67,8 +89,15 @@ def delete_cols(train: pd.DataFrame,
 def label_encoding(train: pd.DataFrame,
                    test: pd.DataFrame,
                    encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Label encoding
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -86,8 +115,15 @@ def label_encoding(train: pd.DataFrame,
 def standerize(train: pd.DataFrame,
                test: pd.DataFrame,
                encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Standerization
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     scaler = preprocessing.StandardScaler()
     train[encode_col] = scaler.fit_transform(train[encode_col])
@@ -99,9 +135,16 @@ def fillna(train: pd.DataFrame,
            test: pd.DataFrame,
            encode_col: List[str],
            how: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
-    option: how={'median', 'mean'}
+    """Replace NaN
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+        how (str): how to fill Nan, chosen from 'median' or 'mean'
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     for f in encode_col:
         if how == 'median':
@@ -116,8 +159,15 @@ def fillna(train: pd.DataFrame,
 def datatime_parser(train: pd.DataFrame,
                     test: pd.DataFrame,
                     encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Datetime columns parser
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     _train = train.copy()
     _test = test.copy()
@@ -140,8 +190,15 @@ def datatime_parser(train: pd.DataFrame,
 def circle_encoding(train: pd.DataFrame,
                     test: pd.DataFrame,
                     encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Circle encoding
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     _train = train.copy()
     _test = test.copy()
@@ -158,9 +215,17 @@ def save_as_pickle(train: pd.DataFrame,
                    target_col: str,
                    exp_id: str,
                    output_dir: str = '../input') -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: target_col
-    option: output_dir, exp_id
+    """Save X_train, X_test and y_train as pickel format
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        target_col (str): target column
+        exp_id (str): experiment id
+        output_dir (str, optional): output directory. Defaults to '../input'.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     X_train = train.drop(target_col, axis=1)
     y_train = train[target_col]
@@ -345,8 +410,16 @@ def aggregation(train: pd.DataFrame,
                 test: pd.DataFrame,
                 groupby_dict: dict,
                 nunique_dict: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: groupby_dict, nunique_dict
+    """Aggregation
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        groupby_dict (dict): settings for groupby
+        nunique_dict (dict): settings for nunique
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -373,9 +446,17 @@ def matrix_factorization(train: pd.DataFrame,
                          encode_col: List[str],
                          n_components_lda: int = 5,
                          n_components_svd: int = 3) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
-    option: n_components_lda, n_components_svd
+    """Matrix factorization
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+        n_components_lda (int, optional): the output dimensions for lda. Defaults to 5.
+        n_components_svd (int, optional): the output dimensions for svd. Defaults to 3.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -406,9 +487,17 @@ def target_encoding(train: pd.DataFrame,
                     encode_col: List[str],
                     target_col: str,
                     cv) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col, target_col
-    option: cv
+    """Target encoding
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+        target_col (str): target column
+        cv (sklearn.model_selection._BaseKFold, optional): sklearn CV object
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     warnings.simplefilter('ignore')
 
@@ -428,8 +517,15 @@ def target_encoding(train: pd.DataFrame,
 def frequency_encoding(train: pd.DataFrame,
                        test: pd.DataFrame,
                        encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Frequency encoding
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -447,8 +543,15 @@ def frequency_encoding(train: pd.DataFrame,
 def count_encoding(train: pd.DataFrame,
                    test: pd.DataFrame,
                    encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Count encoding
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -465,8 +568,15 @@ def count_encoding(train: pd.DataFrame,
 def count_encoding_interact(train: pd.DataFrame,
                             test: pd.DataFrame,
                             encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Count encoding for interaction
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -485,8 +595,15 @@ def count_encoding_interact(train: pd.DataFrame,
 def numeric_interact(train: pd.DataFrame,
                      test: pd.DataFrame,
                      encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Numerical interaction
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -507,8 +624,15 @@ def numeric_interact(train: pd.DataFrame,
 def count_null(train: pd.DataFrame,
                test: pd.DataFrame,
                encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: encode_col
+    """Count NaN
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        encode_col (List[str]): encoded columns
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
