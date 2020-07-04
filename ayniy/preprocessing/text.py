@@ -138,8 +138,14 @@ class BM25Transformer(BaseEstimator, TransformerMixin):
 
 def text_normalize(train: pd.DataFrame,
                    text_col: str) -> pd.DataFrame:
-    """
-    col_definition: text_col
+    """Text normalization
+
+    Args:
+        train (pd.DataFrame): train
+        text_col (str): text column
+
+    Returns:
+        pd.DataFrame: train
     """
     train[text_col] = train[text_col].fillna('').apply(neologdn.normalize)
     return train
@@ -150,9 +156,20 @@ def get_tfidf(train: pd.DataFrame,
               text_col: str,
               n_components: int,
               lang: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: text_col
-    option: n_components, lang={'ja', 'en'}
+    """Get tfidf features
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        text_col (str): text column
+        n_components (int): the output dimension
+        lang (str): language chosen from 'ja' or 'en'
+
+    Raises:
+        ValueError: unsupported language
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -192,11 +209,21 @@ def get_count(train: pd.DataFrame,
               text_col: str,
               n_components: int,
               lang: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: text_col
-    option: n_components, lang={'ja', 'en'}
-    """
+    """Get count features
 
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        text_col (str): text column
+        n_components (int): the output dimension
+        lang (str): language chosen from 'ja' or 'en'
+
+    Raises:
+        ValueError: unsupported language
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
+    """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
     vectorizer = make_pipeline(
@@ -237,9 +264,20 @@ def get_swem_mean(train: pd.DataFrame,
                   text_col: str,
                   n_components: int,
                   lang: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: text_col
-    option: n_components, lang={'ja', 'en'}
+    """Get swem mean features
+
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        text_col (str): text column
+        n_components (int): the output dimension
+        lang (str): language chosen from 'ja' or 'en'
+
+    Raises:
+        ValueError: unsupported language
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
@@ -285,11 +323,21 @@ def get_bert(train: pd.DataFrame,
              n_components: int,
              lang: str,
              batch_size: int = 64) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """
-    col_definition: text_col
-    option: n_components, lang={'ja', 'en'}, batch_size
-    """
+    """Get BERT features
 
+    Args:
+        train (pd.DataFrame): train
+        test (pd.DataFrame): test
+        text_col (str): text column
+        n_components (int): the output dimension
+        lang (str): language chosen from 'ja' or 'en'
+
+    Raises:
+        ValueError: unsupported language
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: train, test
+    """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
     vectorizer = make_pipeline(
