@@ -126,7 +126,9 @@ def focal_loss_lgb(y_pred, dtrain, alpha, gamma):
         p = 1 / (1 + np.exp(-x))
         return -(a * t + (1 - a) * (1 - t)) * ((1 - (t * p + (1 - t) * (1 - p))) ** g) * (t * np.log(p) + (1 - t) * np.log(1 - p))
 
-    partial_fl = lambda x: fl(x, y_true)
+    def partial_fl(x):
+        return fl(x, y_true)
+
     grad = derivative(partial_fl, y_pred, n=1, dx=1e-6)
     hess = derivative(partial_fl, y_pred, n=2, dx=1e-6)
     return grad, hess
@@ -145,8 +147,11 @@ class ModelFocalLGBM(Model):
 
     def train(self, tr_x, tr_y, va_x=None, va_y=None, te_x=None):
 
-        focal_loss = lambda x, y: focal_loss_lgb(x, y, alpha=0.25, gamma=1.)
-        focal_loss_eval = lambda x, y: focal_loss_lgb_eval_error(x, y, alpha=0.25, gamma=1.)
+        def focal_loss(x, y):
+            return focal_loss_lgb(x, y, alpha=0.25, gamma=1.)
+
+        def focal_loss_eval(x, y):
+            return focal_loss_lgb_eval_error(x, y, alpha=0.25, gamma=1.)
 
         # データのセット
         validation = va_x is not None
