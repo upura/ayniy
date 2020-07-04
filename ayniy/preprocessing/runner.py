@@ -41,81 +41,90 @@ class Tabular:
             with timer('count_null'):
                 encode_col = list(self.train.columns)
                 encode_col.remove(self.cols_definition['target_col'])
-                train, test = count_null(self.train, self.test, {'encode_col': encode_col})
+                train, test = count_null(self.train, self.test, encode_col)
 
         if 'label_encoding' in self.preprocessing.keys():
             with timer('label_encoding'):
-                self.train, self.test = label_encoding(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
+                self.train, self.test = label_encoding(self.train, self.test, self.cols_definition['categorical_col'])
 
         if 'frequency_encoding' in self.preprocessing.keys():
             with timer('frequency_encoding'):
-                self.train, self.test = frequency_encoding(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
+                self.train, self.test = frequency_encoding(self.train, self.test, self.cols_definition['categorical_col'])
 
         if 'count_encoding' in self.preprocessing.keys():
             with timer('count_encoding'):
-                self.train, self.test = count_encoding(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
+                self.train, self.test = count_encoding(self.train, self.test, self.cols_definition['categorical_col'])
 
         if 'count_encoding_interact' in self.preprocessing.keys():
             with timer('count_encoding_interact'):
-                self.train, self.test = count_encoding_interact(self.train, self.test, {'encode_col': self.cols_definition['categorical_col']})
+                self.train, self.test = count_encoding_interact(self.train, self.test, self.cols_definition['categorical_col'])
 
         if 'matrix_factorization' in self.preprocessing.keys():
             with timer('matrix_factorization'):
                 self.train, self.test = matrix_factorization(
                     self.train, self.test,
-                    {'encode_col': self.preprocessing['matrix_factorization']},
-                    {'n_components_lda': 5, 'n_components_svd': 3})
+                    self.preprocessing['matrix_factorization'],
+                    n_components_lda=5,
+                    n_components_svd=3)
 
         if 'target_encoding' in self.preprocessing.keys():
             with timer('target_encoding'):
                 self.train, self.test = target_encoding(
                     self.train, self.test,
-                    {'encode_col': self.preprocessing['target_encoding'],
-                     'target_col': self.cols_definition['target_col']},
-                    {'cv': self.cv})
+                    self.preprocessing['target_encoding'],
+                    target_col=self.cols_definition['target_col'],
+                    cv=self.cv)
 
         if 'numeric_interact' in self.preprocessing.keys():
             with timer('numeric_interact'):
-                self.train, self.test = numeric_interact(self.train, self.test, {'encode_col': self.cols_definition['numerical_col']})
+                self.train, self.test = numeric_interact(self.train,
+                                                         self.test,
+                                                         self.cols_definition['numerical_col'])
 
         if 'aggregation' in self.preprocessing.keys():
             with timer('aggregation'):
                 self.train, self.test = aggregation(
                     self.train, self.test,
-                    {'groupby_dict': self.preprocessing['aggregation']['groupby_dict'],
-                     'nunique_dict': self.preprocessing['aggregation']['nunique_dict']})
+                    groupby_dict=self.preprocessing['aggregation']['groupby_dict'],
+                    nunique_dict=self.preprocessing['aggregation']['nunique_dict'])
 
         if 'standerize' in self.preprocessing.keys():
             with timer('standerize'):
-                self.train, self.test = standerize(self.train, self.test, {'encode_col': self.cols_definition['numerical_col']})
+                self.train, self.test = standerize(self.train,
+                                                   self.test,
+                                                   self.cols_definition['numerical_col'])
 
         if 'get_tfidf' in self.preprocessing.keys():
             with timer('get_tfidf'):
                 for tc in self.cols_definition['text_col']:
                     self.train, self.test = get_tfidf(self.train, self.test,
-                                                      {'text_col': tc},
-                                                      self.preprocessing['get_tfidf'])
+                                                      text_col=tc,
+                                                      n_components=self.preprocessing['get_tfidf']['n_components'],
+                                                      lang=self.preprocessing['get_tfidf']['lang'])
 
         if 'get_count' in self.preprocessing.keys():
             with timer('get_count'):
                 for tc in self.cols_definition['text_col']:
                     self.train, self.test = get_count(self.train, self.test,
-                                                      {'text_col': tc},
-                                                      self.preprocessing['get_count'])
+                                                      text_col=tc,
+                                                      n_components=self.preprocessing['get_count']['n_components'],
+                                                      lang=self.preprocessing['get_count']['lang'])
 
         if 'get_swem_mean' in self.preprocessing.keys():
             with timer('get_swem_mean'):
                 for tc in self.cols_definition['text_col']:
                     self.train, self.test = get_swem_mean(self.train, self.test,
-                                                          {'text_col': tc},
-                                                          self.preprocessing['get_swem_mean'])
+                                                          text_col=tc,
+                                                          n_components=self.preprocessing['get_swem_mean']['n_components'],
+                                                          lang=self.preprocessing['get_swem_mean']['lang'])
 
         if 'get_bert' in self.preprocessing.keys():
             with timer('get_bert'):
                 for tc in self.cols_definition['text_col']:
                     self.train, self.test = get_bert(self.train, self.test,
-                                                     {'text_col': tc},
-                                                     self.preprocessing['get_bert'])
+                                                     text_col=tc,
+                                                     n_components=self.preprocessing['get_bert']['n_components'],
+                                                     lang=self.preprocessing['get_bert']['lang'])
 
         if 'get_text_len' in self.preprocessing.keys():
             with timer('get_text_len'):
@@ -129,19 +138,20 @@ class Tabular:
 
         with timer('delete cols'):
             unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(
-                self.train, self.test, {'escape_col': self.cols_definition['categorical_col']}, {'threshold': 0.995})
+                self.train, self.test, escape_col=self.cols_definition['categorical_col'], threshold=0.995)
             self.logger['unique_cols'] = unique_cols
             self.logger['duplicated_cols'] = duplicated_cols
             self.logger['high_corr_cols'] = high_corr_cols
             self.train, self.test = delete_cols(
                 self.train, self.test,
-                {'encode_col': unique_cols + duplicated_cols + high_corr_cols + self.cols_definition['delete_col']})
+                encode_col=unique_cols + duplicated_cols + high_corr_cols + self.cols_definition['delete_col'])
 
         with timer('save'):
             print('train.shape: ', self.train.shape)
             save_as_pickle(self.train, self.test,
-                           {'target_col': self.cols_definition['target_col']},
-                           {'exp_id': self.run_name, 'output_dir': self.output_dir})
+                           target_col=self.cols_definition['target_col'],
+                           exp_id=self.run_name,
+                           output_dir=self.output_dir)
 
     def load(self):
         X_train = Data.load(join(self.output_dir, f"X_train_{self.run_name}.pkl"))
