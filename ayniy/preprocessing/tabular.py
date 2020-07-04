@@ -1,5 +1,6 @@
 import itertools
 from os.path import join
+from typing import List, Tuple
 import warnings
 
 from kaggler.preprocessing import TargetEncoder
@@ -12,16 +13,22 @@ from sklearn.feature_extraction.text import CountVectorizer
 from ayniy.utils import Data
 
 
-def use_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def use_cols(train: pd.DataFrame,
+             test: pd.DataFrame,
+             encode_col: List[str],
+             target_col: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col, target_col
     """
-    train = train[col_definition['encode_col'] + [col_definition['target_col']]]
-    test = test[col_definition['encode_col']]
+    train = train[encode_col + [target_col]]
+    test = test[encode_col]
     return train, test
 
 
-def detect_delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def detect_delete_cols(train: pd.DataFrame,
+                       test: pd.DataFrame,
+                       escape_col: List[str],
+                       threshold: float) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: escape_col
     option: threshold
@@ -33,11 +40,11 @@ def detect_delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: 
     counter = 0
     high_corr_cols = []
     try:
-        for feat_a in [x for x in train.columns if x not in col_definition['escape_col']]:
-            for feat_b in [x for x in train.columns if x not in col_definition['escape_col']]:
+        for feat_a in [x for x in train.columns if x not in escape_col]:
+            for feat_b in [x for x in train.columns if x not in escape_col]:
                 if feat_a != feat_b and feat_a not in high_corr_cols and feat_b not in high_corr_cols:
                     c = buf.loc[feat_a, feat_b]
-                    if c > option['threshold']:
+                    if c > threshold:
                         counter += 1
                         high_corr_cols.append(feat_b)
                         print('{}: FEAT_A: {} FEAT_B: {} - Correlation: {}'.format(counter, feat_a, feat_b, c))
@@ -46,22 +53,26 @@ def detect_delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: 
     return unique_cols, duplicated_cols, high_corr_cols
 
 
-def delete_cols(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def delete_cols(train: pd.DataFrame,
+                test: pd.DataFrame,
+                encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
-    train.drop(col_definition['encode_col'], inplace=True, axis=1)
-    test.drop(col_definition['encode_col'], inplace=True, axis=1)
+    train.drop(encode_col, inplace=True, axis=1)
+    test.drop(encode_col, inplace=True, axis=1)
     return train, test
 
 
-def label_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def label_encoding(train: pd.DataFrame,
+                   test: pd.DataFrame,
+                   encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
-    for f in col_definition['encode_col']:
+    for f in encode_col:
         try:
             lbl = preprocessing.LabelEncoder()
             train[f] = lbl.fit_transform(list(train[f].values))
@@ -72,38 +83,45 @@ def label_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict
     return train, test
 
 
-def standerize(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def standerize(train: pd.DataFrame,
+               test: pd.DataFrame,
+               encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     scaler = preprocessing.StandardScaler()
-    train[col_definition['encode_col']] = scaler.fit_transform(train[col_definition['encode_col']])
-    test[col_definition['encode_col']] = scaler.transform(test[col_definition['encode_col']])
+    train[encode_col] = scaler.fit_transform(train[encode_col])
+    test[encode_col] = scaler.transform(test[encode_col])
     return train, test
 
 
-def fillna(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def fillna(train: pd.DataFrame,
+           test: pd.DataFrame,
+           encode_col: List[str],
+           how: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     option: how={'median', 'mean'}
     """
-    for f in col_definition['encode_col']:
-        if option['how'] == 'median':
+    for f in encode_col:
+        if how == 'median':
             train[f].fillna(train[f].median(), inplace=True)
             test[f].fillna(train[f].median(), inplace=True)
-        elif option['how'] == 'mean':
+        elif how == 'mean':
             train[f].fillna(train[f].mean(), inplace=True)
             test[f].fillna(train[f].mean(), inplace=True)
-    return pd.DataFrame(train), pd.DataFrame(test)
+    return train, test
 
 
-def datatime_parser(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def datatime_parser(train: pd.DataFrame,
+                    test: pd.DataFrame,
+                    encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     _train = train.copy()
     _test = test.copy()
-    for f in col_definition['encode_col']:
+    for f in encode_col:
         _train[f + '_year'] = pd.to_datetime(train[f]).dt.year
         _train[f + '_month'] = pd.to_datetime(train[f]).dt.month
         _train[f + '_day'] = pd.to_datetime(train[f]).dt.day
@@ -119,13 +137,15 @@ def datatime_parser(train: pd.DataFrame, test: pd.DataFrame, col_definition: dic
     return _train, _test
 
 
-def circle_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def circle_encoding(train: pd.DataFrame,
+                    test: pd.DataFrame,
+                    encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     _train = train.copy()
     _test = test.copy()
-    for f in col_definition['encode_col']:
+    for f in encode_col:
         _train[f + '_cos'] = np.cos(2 * np.pi * train[f] / train[f].max())
         _train[f + '_sin'] = np.sin(2 * np.pi * train[f] / train[f].max())
         _test[f + '_cos'] = np.cos(2 * np.pi * test[f] / train[f].max())
@@ -133,21 +153,25 @@ def circle_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dic
     return _train, _test
 
 
-def save_as_pickle(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def save_as_pickle(train: pd.DataFrame,
+                   test: pd.DataFrame,
+                   target_col: str,
+                   exp_id: str,
+                   output_dir: str = '../input') -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: target_col
     option: output_dir, exp_id
     """
-    X_train = train.drop(col_definition['target_col'], axis=1)
-    y_train = train[col_definition['target_col']]
-    if col_definition['target_col'] in test.columns:
-        X_test = test.drop(col_definition['target_col'], axis=1)
+    X_train = train.drop(target_col, axis=1)
+    y_train = train[target_col]
+    if target_col in test.columns:
+        X_test = test.drop(target_col, axis=1)
     else:
         X_test = test
 
-    Data.dump(X_train, join(option['output_dir'], f"X_train_{option['exp_id']}.pkl"))
-    Data.dump(y_train, join(option['output_dir'], f"y_train_{option['exp_id']}.pkl"))
-    Data.dump(X_test, join(option['output_dir'], f"X_test_{option['exp_id']}.pkl"))
+    Data.dump(X_train, join(output_dir, f"X_train_{exp_id}.pkl"))
+    Data.dump(y_train, join(output_dir, f"y_train_{exp_id}.pkl"))
+    Data.dump(X_test, join(output_dir, f"X_test_{exp_id}.pkl"))
 
 
 class GroupbyTransformer():
@@ -317,23 +341,26 @@ class CategoryVectorizer():
         return self.columns
 
 
-def aggregation(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def aggregation(train: pd.DataFrame,
+                test: pd.DataFrame,
+                groupby_dict: dict,
+                nunique_dict: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: groupby_dict, nunique_dict
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    groupby = GroupbyTransformer(param_dict=col_definition['nunique_dict'])
+    groupby = GroupbyTransformer(param_dict=nunique_dict)
     train = groupby.transform(train)
 
-    groupby = GroupbyTransformer(param_dict=col_definition['groupby_dict'])
+    groupby = GroupbyTransformer(param_dict=groupby_dict)
     train = groupby.transform(train)
 
-    diff = DiffGroupbyTransformer(param_dict=col_definition['groupby_dict'])
+    diff = DiffGroupbyTransformer(param_dict=groupby_dict)
     train = diff.transform(train)
 
-    ratio = RatioGroupbyTransformer(param_dict=col_definition['groupby_dict'])
+    ratio = RatioGroupbyTransformer(param_dict=groupby_dict)
     train = ratio.transform(train)
 
     test = train[n_train:].reset_index(drop=True)
@@ -341,7 +368,11 @@ def aggregation(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     return train, test
 
 
-def matrix_factorization(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def matrix_factorization(train: pd.DataFrame,
+                         test: pd.DataFrame,
+                         encode_col: List[str],
+                         n_components_lda: int = 5,
+                         n_components_svd: int = 3) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     option: n_components_lda, n_components_svd
@@ -349,18 +380,18 @@ def matrix_factorization(train: pd.DataFrame, test: pd.DataFrame, col_definition
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    cf = CategoryVectorizer(col_definition['encode_col'],
-                            option['n_components_lda'],
+    cf = CategoryVectorizer(encode_col,
+                            n_components_lda,
                             vectorizer=CountVectorizer(),
-                            transformer=LatentDirichletAllocation(n_components=option['n_components_lda'],
+                            transformer=LatentDirichletAllocation(n_components=n_components_lda,
                                                                   n_jobs=-1, learning_method='online', random_state=777),
                             name='CountLDA')
     features_lda = cf.transform(train).astype(np.float32)
 
-    cf = CategoryVectorizer(col_definition['encode_col'],
-                            option['n_components_svd'],
+    cf = CategoryVectorizer(encode_col,
+                            n_components_svd,
                             vectorizer=CountVectorizer(),
-                            transformer=TruncatedSVD(n_components=option['n_components_svd'], random_state=777),
+                            transformer=TruncatedSVD(n_components=n_components_svd, random_state=777),
                             name='CountSVD')
     features_svd = cf.transform(train).astype(np.float32)
 
@@ -370,34 +401,40 @@ def matrix_factorization(train: pd.DataFrame, test: pd.DataFrame, col_definition
     return train, test
 
 
-def target_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict, option: dict):
+def target_encoding(train: pd.DataFrame,
+                    test: pd.DataFrame,
+                    encode_col: List[str],
+                    target_col: str,
+                    cv) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col, target_col
     option: cv
     """
     warnings.simplefilter('ignore')
 
-    te = TargetEncoder(cv=option['cv'])
+    te = TargetEncoder(cv)
 
-    train_fe = te.fit_transform(train[col_definition['encode_col']], train[col_definition['target_col']])
+    train_fe = te.fit_transform(train[encode_col], train[target_col])
     train_fe.columns = ['te_' + c for c in train_fe.columns]
     train = pd.concat([train, train_fe], axis=1)
 
-    test_fe = te.transform(test[col_definition['encode_col']])
+    test_fe = te.transform(test[encode_col])
     test_fe.columns = ['te_' + c for c in test_fe.columns]
     test = pd.concat([test, test_fe], axis=1)
 
     return train, test
 
 
-def frequency_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def frequency_encoding(train: pd.DataFrame,
+                       test: pd.DataFrame,
+                       encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    for f in col_definition['encode_col']:
+    for f in encode_col:
         grouped = train.groupby(f).size().reset_index(name=f'fe_{f}')
         train = train.merge(grouped, how='left', on=f)
         train[f'fe_{f}'] = train[f'fe_{f}'] / train[f'fe_{f}'].count()
@@ -407,14 +444,16 @@ def frequency_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: 
     return train, test
 
 
-def count_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def count_encoding(train: pd.DataFrame,
+                   test: pd.DataFrame,
+                   encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    for f in col_definition['encode_col']:
+    for f in encode_col:
         count_map = train[f].value_counts().to_dict()
         train[f'ce_{f}'] = train[f].map(count_map)
 
@@ -423,14 +462,16 @@ def count_encoding(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict
     return train, test
 
 
-def count_encoding_interact(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def count_encoding_interact(train: pd.DataFrame,
+                            test: pd.DataFrame,
+                            encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    for col1, col2 in list(itertools.combinations(col_definition['encode_col'], 2)):
+    for col1, col2 in list(itertools.combinations(encode_col, 2)):
         col = col1 + '_' + col2
         _tmp = train[col1].astype(str) + "_" + train[col2].astype(str)
         count_map = _tmp.value_counts().to_dict()
@@ -441,14 +482,16 @@ def count_encoding_interact(train: pd.DataFrame, test: pd.DataFrame, col_definit
     return train, test
 
 
-def numeric_interact(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def numeric_interact(train: pd.DataFrame,
+                     test: pd.DataFrame,
+                     encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    for col1, col2 in list(itertools.combinations(col_definition['encode_col'], 2)):
+    for col1, col2 in list(itertools.combinations(encode_col, 2)):
         train[f'{col1}_plus_{col2}'] = train[col1] + train[col2]
         train[f'{col1}_mul_{col2}'] = train[col1] * train[col2]
         try:
@@ -461,7 +504,9 @@ def numeric_interact(train: pd.DataFrame, test: pd.DataFrame, col_definition: di
     return train, test
 
 
-def count_null(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
+def count_null(train: pd.DataFrame,
+               test: pd.DataFrame,
+               encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     col_definition: encode_col
     """
@@ -469,7 +514,7 @@ def count_null(train: pd.DataFrame, test: pd.DataFrame, col_definition: dict):
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
     train['count_null'] = train.isnull().sum(axis=1)
-    for f in col_definition['encode_col']:
+    for f in encode_col:
         if sum(train[f].isnull().astype(int)) > 0:
             train[f'cn_{f}'] = train[f].isnull().astype(int)
 
