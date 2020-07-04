@@ -2,7 +2,6 @@ import os
 import datetime
 
 import pandas as pd
-import pytest
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 
