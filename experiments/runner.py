@@ -20,14 +20,14 @@ cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
 
 if args.fe:
     f = open(args.fe, 'r+')
-    fe_configs = yaml.load(f)
+    fe_configs = yaml.load(f, Loader=yaml.SafeLoader)
 
     tabular = Tabular(fe_configs, cv)
     tabular.create()
 
 if args.run:
     g = open(args.run, 'r+')
-    run_configs = yaml.load(g)
+    run_configs = yaml.load(g, Loader=yaml.SafeLoader)
 
     runner = Runner(run_configs, cv)
     runner.run_train_cv()

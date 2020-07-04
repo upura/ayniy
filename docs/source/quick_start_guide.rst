@@ -11,9 +11,9 @@ Quick Start Guide
 
    # Load configs
    f = open('configs/fe000.yml', 'r+')
-   fe_configs = yaml.load(f)
+   fe_configs = yaml.load(f, Loader=yaml.SafeLoader)
    g = open('configs/run000.yml', 'r+')
-   run_configs = yaml.load(g)
+   run_configs = yaml.load(g, Loader=yaml.SafeLoader)
 
    # CV strategy
    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)

@@ -13,9 +13,9 @@ from ayniy.model.runner import Runner
 
 # Load configs
 f = open('configs/fe000.yml', 'r+')
-fe_configs = yaml.load(f)
+fe_configs = yaml.load(f, Loader=yaml.SafeLoader)
 g = open('configs/run000.yml', 'r+')
-run_configs = yaml.load(g)
+run_configs = yaml.load(g, Loader=yaml.SafeLoader)
 
 # Difine CV strategy as you like
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
@@ -52,8 +52,9 @@ mlflow ui
 
 ## Test
 
-``` 
-pytest tests/ --cov=. --cov-report=html
+```
+cd test
+pytest --cov=. --cov-report=html
 ```
 
 ## Docs
