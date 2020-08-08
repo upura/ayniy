@@ -1,9 +1,7 @@
 import itertools
 from os.path import join
 from typing import List, Tuple
-import warnings
 
-from kaggler.preprocessing import TargetEncoder
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
@@ -479,38 +477,6 @@ def matrix_factorization(train: pd.DataFrame,
     train = pd.concat([train, features_svd, features_lda], axis=1)
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
-    return train, test
-
-
-def target_encoding(train: pd.DataFrame,
-                    test: pd.DataFrame,
-                    encode_col: List[str],
-                    target_col: str,
-                    cv) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Target encoding
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-        target_col (str): target column
-        cv (sklearn.model_selection._BaseKFold, optional): sklearn CV object
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    warnings.simplefilter('ignore')
-
-    te = TargetEncoder(cv=cv)
-
-    train_fe = te.fit_transform(train[encode_col], train[target_col])
-    train_fe.columns = ['te_' + c for c in train_fe.columns]
-    train = pd.concat([train, train_fe], axis=1)
-
-    test_fe = te.transform(test[encode_col])
-    test_fe.columns = ['te_' + c for c in test_fe.columns]
-    test = pd.concat([test, test_fe], axis=1)
-
     return train, test
 
 

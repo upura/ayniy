@@ -10,7 +10,6 @@ from ayniy.preprocessing import (count_null,
                                  count_encoding,
                                  count_encoding_interact,
                                  matrix_factorization,
-                                 target_encoding,
                                  aggregation,
                                  numeric_interact,
                                  standerize,
@@ -66,14 +65,6 @@ class Tabular:
                     self.preprocessing['matrix_factorization'],
                     n_components_lda=5,
                     n_components_svd=3)
-
-        if 'target_encoding' in self.preprocessing.keys():
-            with timer('target_encoding'):
-                self.train, self.test = target_encoding(
-                    self.train, self.test,
-                    self.preprocessing['target_encoding'],
-                    target_col=self.cols_definition['target_col'],
-                    cv=self.cv)
 
         if 'numeric_interact' in self.preprocessing.keys():
             with timer('numeric_interact'):

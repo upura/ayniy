@@ -11,7 +11,6 @@ from ayniy.preprocessing import (count_null,
                                  count_encoding,
                                  count_encoding_interact,
                                  matrix_factorization,
-                                 target_encoding,
                                  aggregation,
                                  numeric_interact,
                                  standerize,
@@ -92,19 +91,6 @@ def test_numeric_interact(load_titanic):
     train, _ = numeric_interact(train, test, encode_col)
     for c in cols:
         assert train[f'{encode_col[0]}{c}{encode_col[1]}'].dtype == np.float64
-
-
-def test_target_encoding(load_titanic):
-    train, test = load_titanic
-    encode_col = ['embarked', 'sex']
-    target_col = 'survived'
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
-    prefix = 'te_'
-    train, _ = target_encoding(train, test,
-                               encode_col,
-                               target_col,
-                               cv)
-    assert train[prefix + encode_col[0]].dtype == np.float64
 
 
 def test_standerize(load_titanic):
