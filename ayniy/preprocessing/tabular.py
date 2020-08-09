@@ -1,36 +1,11 @@
 import itertools
-from os.path import join
 from typing import List, Tuple
-import warnings
 
-from kaggler.preprocessing import TargetEncoder
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.decomposition import LatentDirichletAllocation, TruncatedSVD
 from sklearn.feature_extraction.text import CountVectorizer
-
-from ayniy.utils import Data
-
-
-def use_cols(train: pd.DataFrame,
-             test: pd.DataFrame,
-             encode_col: List[str],
-             target_col: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Select columns
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-        target_col (str): target column
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    train = train[encode_col + [target_col]]
-    test = test[encode_col]
-    return train, test
 
 
 def detect_delete_cols(train: pd.DataFrame,
@@ -66,50 +41,6 @@ def detect_delete_cols(train: pd.DataFrame,
     except:
         pass
     return unique_cols, duplicated_cols, high_corr_cols
-
-
-def delete_cols(train: pd.DataFrame,
-                test: pd.DataFrame,
-                encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Delete columns
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    train.drop(encode_col, inplace=True, axis=1)
-    test.drop(encode_col, inplace=True, axis=1)
-    return train, test
-
-
-def label_encoding(train: pd.DataFrame,
-                   test: pd.DataFrame,
-                   encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Label encoding
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    n_train = len(train)
-    train = pd.concat([train, test], sort=False).reset_index(drop=True)
-    for f in encode_col:
-        try:
-            lbl = preprocessing.LabelEncoder()
-            train[f] = lbl.fit_transform(list(train[f].values))
-        except:
-            print(f)
-    test = train[n_train:].reset_index(drop=True)
-    train = train[:n_train]
-    return train, test
 
 
 def standerize(train: pd.DataFrame,
@@ -156,7 +87,7 @@ def fillna(train: pd.DataFrame,
     return train, test
 
 
-def datatime_parser(train: pd.DataFrame,
+def datetime_parser(train: pd.DataFrame,
                     test: pd.DataFrame,
                     encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Datetime columns parser
@@ -208,35 +139,6 @@ def circle_encoding(train: pd.DataFrame,
         _test[f + '_cos'] = np.cos(2 * np.pi * test[f] / train[f].max())
         _test[f + '_sin'] = np.sin(2 * np.pi * test[f] / train[f].max())
     return _train, _test
-
-
-def save_as_pickle(train: pd.DataFrame,
-                   test: pd.DataFrame,
-                   target_col: str,
-                   exp_id: str,
-                   output_dir: str = '../input') -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Save X_train, X_test and y_train as pickel format
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        target_col (str): target column
-        exp_id (str): experiment id
-        output_dir (str, optional): output directory. Defaults to '../input'.
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    X_train = train.drop(target_col, axis=1)
-    y_train = train[target_col]
-    if target_col in test.columns:
-        X_test = test.drop(target_col, axis=1)
-    else:
-        X_test = test
-
-    Data.dump(X_train, join(output_dir, f"X_train_{exp_id}.pkl"))
-    Data.dump(y_train, join(output_dir, f"y_train_{exp_id}.pkl"))
-    Data.dump(X_test, join(output_dir, f"X_test_{exp_id}.pkl"))
 
 
 class GroupbyTransformer():
@@ -482,38 +384,6 @@ def matrix_factorization(train: pd.DataFrame,
     return train, test
 
 
-def target_encoding(train: pd.DataFrame,
-                    test: pd.DataFrame,
-                    encode_col: List[str],
-                    target_col: str,
-                    cv) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Target encoding
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-        target_col (str): target column
-        cv (sklearn.model_selection._BaseKFold, optional): sklearn CV object
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    warnings.simplefilter('ignore')
-
-    te = TargetEncoder(cv=cv)
-
-    train_fe = te.fit_transform(train[encode_col], train[target_col])
-    train_fe.columns = ['te_' + c for c in train_fe.columns]
-    train = pd.concat([train, train_fe], axis=1)
-
-    test_fe = te.transform(test[encode_col])
-    test_fe.columns = ['te_' + c for c in test_fe.columns]
-    test = pd.concat([test, test_fe], axis=1)
-
-    return train, test
-
-
 def frequency_encoding(train: pd.DataFrame,
                        test: pd.DataFrame,
                        encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
@@ -534,87 +404,6 @@ def frequency_encoding(train: pd.DataFrame,
         grouped = train.groupby(f).size().reset_index(name=f'fe_{f}')
         train = train.merge(grouped, how='left', on=f)
         train[f'fe_{f}'] = train[f'fe_{f}'] / train[f'fe_{f}'].count()
-
-    test = train[n_train:].reset_index(drop=True)
-    train = train[:n_train]
-    return train, test
-
-
-def count_encoding(train: pd.DataFrame,
-                   test: pd.DataFrame,
-                   encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Count encoding
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    n_train = len(train)
-    train = pd.concat([train, test], sort=False).reset_index(drop=True)
-
-    for f in encode_col:
-        count_map = train[f].value_counts().to_dict()
-        train[f'ce_{f}'] = train[f].map(count_map)
-
-    test = train[n_train:].reset_index(drop=True)
-    train = train[:n_train]
-    return train, test
-
-
-def count_encoding_interact(train: pd.DataFrame,
-                            test: pd.DataFrame,
-                            encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Count encoding for interaction
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    n_train = len(train)
-    train = pd.concat([train, test], sort=False).reset_index(drop=True)
-
-    for col1, col2 in list(itertools.combinations(encode_col, 2)):
-        col = col1 + '_' + col2
-        _tmp = train[col1].astype(str) + "_" + train[col2].astype(str)
-        count_map = _tmp.value_counts().to_dict()
-        train[f'cei_{col}'] = _tmp.map(count_map)
-
-    test = train[n_train:].reset_index(drop=True)
-    train = train[:n_train]
-    return train, test
-
-
-def numeric_interact(train: pd.DataFrame,
-                     test: pd.DataFrame,
-                     encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Numerical interaction
-
-    Args:
-        train (pd.DataFrame): train
-        test (pd.DataFrame): test
-        encode_col (List[str]): encoded columns
-
-    Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
-    """
-    n_train = len(train)
-    train = pd.concat([train, test], sort=False).reset_index(drop=True)
-
-    for col1, col2 in list(itertools.combinations(encode_col, 2)):
-        train[f'{col1}_plus_{col2}'] = train[col1] + train[col2]
-        train[f'{col1}_mul_{col2}'] = train[col1] * train[col2]
-        try:
-            train[f'{col1}_div_{col2}'] = train[col1] / train[col2]
-        except:
-            print(f'{col1}_div_{col2}')
 
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
