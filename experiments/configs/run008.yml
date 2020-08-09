@@ -1,4 +1,4 @@
-description: TNN
+description: Ridge
 exp_name: 'petfinder-adoption-prediction'
 run_name: 'run008'
 fe_name: 'fe000'
@@ -18,10 +18,9 @@ cols_definition:
     'State',
     'RescuerID'
   ]
-model_name: 'ModelTNNRegressor'
+model_name: 'ModelRIDGE'
 params: {
-  'nb_epoch': 10,
-  'patience': 10,
-  'dropout': 0.3,
+  'alpha': 100,
+  'random_state': 0
 }
 evaluation_metric: 'rmse'

@@ -8,5 +8,6 @@ loguru==0.5.1
 mecab-python3==0.996.5
 mlflow==1.10.0
 nagisa==0.2.7
+optuna==2.0.0
 neologdn==0.4
 pykakasi==2.0.1
