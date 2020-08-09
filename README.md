@@ -6,9 +6,9 @@ Ayniy is a supporting tool for machine learning competitions.
 
 ```python
 # Import packages
-import yaml
 from sklearn.model_selection import StratifiedKFold
-from ayniy.preprocessing.runner import Tabular
+import yaml
+
 from ayniy.model.runner import Runner
 
 # Load configs
