@@ -5,7 +5,7 @@ from ayniy.preprocessing.tabular import (count_null,
                                          aggregation,
                                          standerize,
                                          fillna,
-                                         datatime_parser,
+                                         datetime_parser,
                                          circle_encoding,
                                          detect_delete_cols)
 
@@ -16,6 +16,6 @@ __all__ = [xfeat_runner,
            aggregation,
            standerize,
            fillna,
-           datatime_parser,
+           datetime_parser,
            circle_encoding,
            detect_delete_cols]

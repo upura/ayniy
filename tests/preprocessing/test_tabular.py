@@ -9,7 +9,7 @@ from ayniy.preprocessing import (count_null,
                                  aggregation,
                                  standerize,
                                  fillna,
-                                 datatime_parser,
+                                 datetime_parser,
                                  circle_encoding,
                                  detect_delete_cols)
 
@@ -46,12 +46,12 @@ def test_fillna(load_titanic):
     assert train['fare'].isnull().sum() == 0
 
 
-def test_datatime_parser(load_titanic):
+def test_datetime_parser(load_titanic):
     train, test = load_titanic
     train['now'] = datetime.datetime.now()
     test['now'] = datetime.datetime.now()
     encode_col = ['now']
-    train_new, _ = datatime_parser(train, test, encode_col)
+    train_new, _ = datetime_parser(train, test, encode_col)
     assert len((set(train_new.columns) - set(train.columns))) > 0
 
 

@@ -87,7 +87,7 @@ def fillna(train: pd.DataFrame,
     return train, test
 
 
-def datatime_parser(train: pd.DataFrame,
+def datetime_parser(train: pd.DataFrame,
                     test: pd.DataFrame,
                     encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Datetime columns parser
