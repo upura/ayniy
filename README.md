@@ -12,29 +12,18 @@ from ayniy.preprocessing.runner import Tabular
 from ayniy.model.runner import Runner
 
 # Load configs
-f = open('configs/fe000.yml', 'r+')
-fe_configs = yaml.load(f, Loader=yaml.SafeLoader)
-g = open('configs/run000.yml', 'r+')
-run_configs = yaml.load(g, Loader=yaml.SafeLoader)
+f = open('configs/run000.yml', 'r+')
+configs = yaml.load(f, Loader=yaml.SafeLoader)
 
 # Difine CV strategy as you like
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
 
-# Feature engineering
-tabular = Tabular(fe_configs, cv)
-tabular.create()
-
 # Modeling
-runner = Runner(run_configs, cv)
+runner = Runner(configs, cv)
 runner.run_train_cv()
 runner.run_predict_cv()
 runner.submission()
 ```
-
-## Examples
-
-- [atmaCup #5](https://github.com/upura/atma-comp5)
-- [ProbSpace YouTube](https://github.com/upura/probspace-youtube)
 
 ## Environment
 
@@ -53,7 +42,7 @@ mlflow ui
 ## Test
 
 ```
-cd test
+cd tests
 pytest --cov=. --cov-report=html
 ```
 
