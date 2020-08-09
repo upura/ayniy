@@ -9,3 +9,5 @@ RUN apt-get update -y && \
 
 RUN pip install -U pip && \
     pip install -r requirements.txt
+
+RUN pip install -q https://github.com/pfnet-research/xfeat/archive/master.zip

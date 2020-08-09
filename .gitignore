@@ -3,6 +3,7 @@
 *.csv
 *.pickle
 *.pkl
+*.ftr
 *.zip
 *.model
 *.h5
