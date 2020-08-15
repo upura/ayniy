@@ -1,15 +1,13 @@
 import os
 
 import pandas as pd
-from sklearn.model_selection import KFold
 import xfeat
 from xfeat import (ArithmeticCombinations,
                    LabelEncoder,
                    CountEncoder,
-                   ConcatCombination,
-                   TargetEncoder)
+                   ConcatCombination)
 
-from ayniy.preprocessing import xfeat_runner
+from ayniy.preprocessing import xfeat_runner, xfeat_target_encoding
 
 
 categorical_cols = [
@@ -112,13 +110,8 @@ if __name__ == '__main__':
     )
 
     # TargetEncoder
-    xfeat_runner(
-        pipelines=[
-            TargetEncoder(
-                fold=KFold(n_splits=5, shuffle=True, random_state=7),
-                target_col=target_col,
-            ),
-        ],
+    xfeat_target_encoding(
+        target_col=target_col,
         input_df=train[categorical_cols + [target_col]],
         output_filename='../input/petfinder-adoption-prediction/TargetEncoder.ftr'
     )
