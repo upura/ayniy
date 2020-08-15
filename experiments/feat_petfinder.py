@@ -8,6 +8,7 @@ from xfeat import (ArithmeticCombinations,
                    ConcatCombination)
 
 from ayniy.preprocessing import xfeat_runner, xfeat_target_encoding
+from ayniy.utils import FeatureStore
 
 
 categorical_cols = [
@@ -115,3 +116,21 @@ if __name__ == '__main__':
         input_df=train[categorical_cols + [target_col]],
         output_filename='../input/petfinder-adoption-prediction/TargetEncoder.ftr'
     )
+
+    features = FeatureStore(
+        feature_names=[
+            '../input/petfinder-adoption-prediction/train_test.ftr',
+            '../input/petfinder-adoption-prediction/ArithmeticCombinations.ftr',
+            '../input/petfinder-adoption-prediction/LabelEncoder.ftr',
+            '../input/petfinder-adoption-prediction/CountEncoder.ftr',
+            '../input/petfinder-adoption-prediction/ConcatCombinationR2.ftr',
+            '../input/petfinder-adoption-prediction/ConcatCombinationCountEncoder.ftr',
+            '../input/petfinder-adoption-prediction/TargetEncoder.ftr'
+        ],
+        target_col='AdoptionSpeed'
+    )
+
+    X_train = features.X_train
+    y_train = features.y_train
+    X_test = features.X_test
+    print(X_train.shape)

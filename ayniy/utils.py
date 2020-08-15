@@ -6,8 +6,9 @@ import random
 import sys
 import time
 
-import numpy as np
 import joblib
+import numpy as np
+import pandas as pd
 import torch
 
 
@@ -117,3 +118,22 @@ class Logger:
 
     def to_ltsv(self, dic):
         return '\t'.join(['{}:{}'.format(key, value) for key, value in dic.items()])
+
+
+class FeatureStore:
+
+    def __init__(self, feature_names, target_col: str):
+        self.feature_names = feature_names
+        self.target_col = target_col
+
+        _res = []
+        for f in feature_names:
+            _res.append(pd.read_feather(f))
+        _res = pd.concat(_res)
+
+        _train = _res.dropna(subset=[target_col]).copy()
+        _test = _res.loc[_res[target_col].isnull()].copy()
+
+        self.X_train = _train.drop(target_col, axis=1)
+        self.y_train = _train[target_col]
+        self.X_test = _test.drop(target_col, axis=1)
