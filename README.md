@@ -41,9 +41,15 @@ mlflow ui
 
 ## Test
 
+### pytest
 ```
 cd tests
 pytest --cov=. --cov-report=html
+```
+
+### black
+```
+black . --line-length 120 --exclude="docs"
 ```
 
 ## Docs
