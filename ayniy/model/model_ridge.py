@@ -7,7 +7,6 @@ from ayniy.utils import Data
 
 
 class ModelRIDGE(Model):
-
     def train(self, tr_x, tr_y, va_x=None, va_y=None, te_x=None):
 
         # ハイパーパラメータの設定
@@ -20,10 +19,10 @@ class ModelRIDGE(Model):
         return self.model.predict(te_x)
 
     def save_model(self):
-        model_path = os.path.join('../output/model', f'{self.run_fold_name}.model')
+        model_path = os.path.join("../output/model", f"{self.run_fold_name}.model")
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
         Data.dump(self.model, model_path)
 
     def load_model(self):
-        model_path = os.path.join('../output/model', f'{self.run_fold_name}.model')
+        model_path = os.path.join("../output/model", f"{self.run_fold_name}.model")
         self.model = Data.load(model_path)
