@@ -45,21 +45,21 @@ if __name__ == "__main__":
 
     # ArithmeticCombinations
     xfeat_runner(
-        pipelines=[ArithmeticCombinations(drop_origin=True, operator="+", r=2,),],
+        pipelines=[ArithmeticCombinations(drop_origin=True, operator="+", r=2,)],
         input_df=train[numerical_cols],
         output_filename="../input/petfinder-adoption-prediction/ArithmeticCombinations.ftr",
     )
 
     # LabelEncoder
     xfeat_runner(
-        pipelines=[LabelEncoder(output_suffix=""),],
+        pipelines=[LabelEncoder(output_suffix="")],
         input_df=train[categorical_cols],
         output_filename="../input/petfinder-adoption-prediction/LabelEncoder.ftr",
     )
 
     # CountEncoder
     xfeat_runner(
-        pipelines=[LabelEncoder(output_suffix=""), CountEncoder(),],
+        pipelines=[LabelEncoder(output_suffix=""), CountEncoder()],
         input_df=train[categorical_cols],
         output_filename="../input/petfinder-adoption-prediction/CountEncoder.ftr",
     )
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     # ConcatCombination r=2 & CountEncoder
     xfeat_runner(
-        pipelines=[LabelEncoder(output_suffix=""), ConcatCombination(drop_origin=True, r=2), CountEncoder(),],
+        pipelines=[LabelEncoder(output_suffix=""), ConcatCombination(drop_origin=True, r=2), CountEncoder()],
         input_df=train[categorical_cols],
         output_filename="../input/petfinder-adoption-prediction/ConcatCombinationCountEncoder.ftr",
     )
