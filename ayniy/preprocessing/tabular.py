@@ -8,10 +8,9 @@ from sklearn.decomposition import LatentDirichletAllocation, TruncatedSVD
 from sklearn.feature_extraction.text import CountVectorizer
 
 
-def detect_delete_cols(train: pd.DataFrame,
-                       test: pd.DataFrame,
-                       escape_col: List[str],
-                       threshold: float) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def detect_delete_cols(
+    train: pd.DataFrame, test: pd.DataFrame, escape_col: List[str], threshold: float
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Detect unnecessary columns for deleting
 
     Args:
@@ -37,15 +36,13 @@ def detect_delete_cols(train: pd.DataFrame,
                     if c > threshold:
                         counter += 1
                         high_corr_cols.append(feat_b)
-                        print('{}: FEAT_A: {} FEAT_B: {} - Correlation: {}'.format(counter, feat_a, feat_b, c))
+                        print("{}: FEAT_A: {} FEAT_B: {} - Correlation: {}".format(counter, feat_a, feat_b, c))
     except:
         pass
     return unique_cols, duplicated_cols, high_corr_cols
 
 
-def standerize(train: pd.DataFrame,
-               test: pd.DataFrame,
-               encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def standerize(train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Standerization
 
     Args:
@@ -62,10 +59,9 @@ def standerize(train: pd.DataFrame,
     return train, test
 
 
-def fillna(train: pd.DataFrame,
-           test: pd.DataFrame,
-           encode_col: List[str],
-           how: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def fillna(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str], how: str
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Replace NaN
 
     Args:
@@ -78,18 +74,18 @@ def fillna(train: pd.DataFrame,
         Tuple[pd.DataFrame, pd.DataFrame]: train, test
     """
     for f in encode_col:
-        if how == 'median':
+        if how == "median":
             train[f].fillna(train[f].median(), inplace=True)
             test[f].fillna(train[f].median(), inplace=True)
-        elif how == 'mean':
+        elif how == "mean":
             train[f].fillna(train[f].mean(), inplace=True)
             test[f].fillna(train[f].mean(), inplace=True)
     return train, test
 
 
-def datetime_parser(train: pd.DataFrame,
-                    test: pd.DataFrame,
-                    encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def datetime_parser(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Datetime columns parser
 
     Args:
@@ -103,24 +99,24 @@ def datetime_parser(train: pd.DataFrame,
     _train = train.copy()
     _test = test.copy()
     for f in encode_col:
-        _train[f + '_year'] = pd.to_datetime(train[f]).dt.year
-        _train[f + '_month'] = pd.to_datetime(train[f]).dt.month
-        _train[f + '_day'] = pd.to_datetime(train[f]).dt.day
-        _train[f + '_dow'] = pd.to_datetime(train[f]).dt.dayofweek
-        _train[f + '_hour'] = pd.to_datetime(train[f]).dt.hour
-        _train[f + '_minute'] = pd.to_datetime(train[f]).dt.minute
-        _test[f + '_year'] = pd.to_datetime(test[f]).dt.year
-        _test[f + '_month'] = pd.to_datetime(test[f]).dt.month
-        _test[f + '_day'] = pd.to_datetime(test[f]).dt.day
-        _test[f + '_dow'] = pd.to_datetime(test[f]).dt.dayofweek
-        _test[f + '_hour'] = pd.to_datetime(test[f]).dt.hour
-        _test[f + '_minute'] = pd.to_datetime(test[f]).dt.minute
+        _train[f + "_year"] = pd.to_datetime(train[f]).dt.year
+        _train[f + "_month"] = pd.to_datetime(train[f]).dt.month
+        _train[f + "_day"] = pd.to_datetime(train[f]).dt.day
+        _train[f + "_dow"] = pd.to_datetime(train[f]).dt.dayofweek
+        _train[f + "_hour"] = pd.to_datetime(train[f]).dt.hour
+        _train[f + "_minute"] = pd.to_datetime(train[f]).dt.minute
+        _test[f + "_year"] = pd.to_datetime(test[f]).dt.year
+        _test[f + "_month"] = pd.to_datetime(test[f]).dt.month
+        _test[f + "_day"] = pd.to_datetime(test[f]).dt.day
+        _test[f + "_dow"] = pd.to_datetime(test[f]).dt.dayofweek
+        _test[f + "_hour"] = pd.to_datetime(test[f]).dt.hour
+        _test[f + "_minute"] = pd.to_datetime(test[f]).dt.minute
     return _train, _test
 
 
-def circle_encoding(train: pd.DataFrame,
-                    test: pd.DataFrame,
-                    encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def circle_encoding(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Circle encoding
 
     Args:
@@ -134,29 +130,29 @@ def circle_encoding(train: pd.DataFrame,
     _train = train.copy()
     _test = test.copy()
     for f in encode_col:
-        _train[f + '_cos'] = np.cos(2 * np.pi * train[f] / train[f].max())
-        _train[f + '_sin'] = np.sin(2 * np.pi * train[f] / train[f].max())
-        _test[f + '_cos'] = np.cos(2 * np.pi * test[f] / train[f].max())
-        _test[f + '_sin'] = np.sin(2 * np.pi * test[f] / train[f].max())
+        _train[f + "_cos"] = np.cos(2 * np.pi * train[f] / train[f].max())
+        _train[f + "_sin"] = np.sin(2 * np.pi * train[f] / train[f].max())
+        _test[f + "_cos"] = np.cos(2 * np.pi * test[f] / train[f].max())
+        _test[f + "_sin"] = np.sin(2 * np.pi * test[f] / train[f].max())
     return _train, _test
 
 
-class GroupbyTransformer():
+class GroupbyTransformer:
     def __init__(self, param_dict=None):
         self.param_dict = param_dict
 
     def _get_params(self, p_dict):
-        key = p_dict['key']
-        if 'var' in p_dict.keys():
-            var = p_dict['var']
+        key = p_dict["key"]
+        if "var" in p_dict.keys():
+            var = p_dict["var"]
         else:
             var = self.var
-        if 'agg' in p_dict.keys():
-            agg = p_dict['agg']
+        if "agg" in p_dict.keys():
+            agg = p_dict["agg"]
         else:
             agg = self.agg
-        if 'on' in p_dict.keys():
-            on = p_dict['on']
+        if "on" in p_dict.keys():
+            on = p_dict["on"]
         else:
             on = key
         return key, var, agg, on
@@ -167,8 +163,7 @@ class GroupbyTransformer():
             key, var, agg, on = self._get_params(param_dict)
             all_features = list(set(key + var))
             new_features = self._get_feature_names(key, var, agg)
-            features = dataframe[all_features].groupby(key)[
-                var].agg(agg).reset_index()
+            features = dataframe[all_features].groupby(key)[var].agg(agg).reset_index()
             features.columns = key + new_features
             self.features.append(features)
         return self
@@ -177,7 +172,7 @@ class GroupbyTransformer():
         for param_dict, features in zip(self.param_dict, self.features):
             key, var, agg, on = self._get_params(param_dict)
             if merge:
-                dataframe = dataframe.merge(features, how='left', on=on)
+                dataframe = dataframe.merge(features, how="left", on=on)
             else:
                 new_features = self._get_feature_names(key, var, agg)
                 dataframe = pd.concat([dataframe, features[new_features]], axis=1)
@@ -194,7 +189,7 @@ class GroupbyTransformer():
                 _agg.append(a.__name__)
             else:
                 _agg.append(a)
-        return ['_'.join([a, v, 'groupby'] + key) for v in var for a in _agg]
+        return ["_".join([a, v, "groupby"] + key) for v in var for a in _agg]
 
     def get_feature_names(self):
         self.feature_names = []
@@ -219,8 +214,8 @@ class DiffGroupbyTransformer(GroupbyTransformer):
             key, var, agg, on = self._get_params(param_dict)
             for a in agg:
                 for v in var:
-                    new_feature = '_'.join(['diff', a, v, 'groupby'] + key)
-                    base_feature = '_'.join([a, v, 'groupby'] + key)
+                    new_feature = "_".join(["diff", a, v, "groupby"] + key)
+                    base_feature = "_".join([a, v, "groupby"] + key)
                     dataframe[new_feature] = dataframe[base_feature] - dataframe[v]
         return dataframe
 
@@ -231,7 +226,7 @@ class DiffGroupbyTransformer(GroupbyTransformer):
                 _agg.append(a.__name__)
             else:
                 _agg.append(a)
-        return ['_'.join(['diff', a, v, 'groupby'] + key) for v in var for a in _agg]
+        return ["_".join(["diff", a, v, "groupby"] + key) for v in var for a in _agg]
 
 
 class RatioGroupbyTransformer(GroupbyTransformer):
@@ -246,8 +241,8 @@ class RatioGroupbyTransformer(GroupbyTransformer):
             key, var, agg, on = self._get_params(param_dict)
             for a in agg:
                 for v in var:
-                    new_feature = '_'.join(['ratio', a, v, 'groupby'] + key)
-                    base_feature = '_'.join([a, v, 'groupby'] + key)
+                    new_feature = "_".join(["ratio", a, v, "groupby"] + key)
+                    base_feature = "_".join([a, v, "groupby"] + key)
                     dataframe[new_feature] = dataframe[v] / dataframe[base_feature]
         return dataframe
 
@@ -258,14 +253,18 @@ class RatioGroupbyTransformer(GroupbyTransformer):
                 _agg.append(a.__name__)
             else:
                 _agg.append(a)
-        return ['_'.join(['ratio', a, v, 'groupby'] + key) for v in var for a in _agg]
+        return ["_".join(["ratio", a, v, "groupby"] + key) for v in var for a in _agg]
 
 
-class CategoryVectorizer():
-    def __init__(self, categorical_columns, n_components,
-                 vectorizer=CountVectorizer(),
-                 transformer=LatentDirichletAllocation(),
-                 name='CountLDA'):
+class CategoryVectorizer:
+    def __init__(
+        self,
+        categorical_columns,
+        n_components,
+        vectorizer=CountVectorizer(),
+        transformer=LatentDirichletAllocation(),
+        name="CountLDA",
+    ):
         self.categorical_columns = categorical_columns
         self.n_components = n_components
         self.vectorizer = vectorizer
@@ -291,13 +290,13 @@ class CategoryVectorizer():
         col2_list = [[] for _ in range(col1_size)]
         for val1, val2 in zip(dataframe[col1].values, dataframe[col2].values):
             col2_list[int(val1)].append(col2 + str(val2))
-        return [' '.join(map(str, ls)) for ls in col2_list]
+        return [" ".join(map(str, ls)) for ls in col2_list]
 
-    def get_feature(self, dataframe, col1, col2, latent_vector, name=''):
+    def get_feature(self, dataframe, col1, col2, latent_vector, name=""):
         features = np.zeros(shape=(len(dataframe), self.n_components), dtype=np.float32)
-        self.columns = ['_'.join([name, col1, col2, str(i)]) for i in range(self.n_components)]
+        self.columns = ["_".join([name, col1, col2, str(i)]) for i in range(self.n_components)]
         for i, val1 in enumerate(dataframe[col1]):
-            features[i, :self.n_components] = latent_vector[val1]
+            features[i, : self.n_components] = latent_vector[val1]
 
         return pd.DataFrame(data=features, columns=self.columns)
 
@@ -308,10 +307,9 @@ class CategoryVectorizer():
         return self.columns
 
 
-def aggregation(train: pd.DataFrame,
-                test: pd.DataFrame,
-                groupby_dict: dict,
-                nunique_dict: dict) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def aggregation(
+    train: pd.DataFrame, test: pd.DataFrame, groupby_dict: dict, nunique_dict: dict
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Aggregation
 
     Args:
@@ -343,11 +341,9 @@ def aggregation(train: pd.DataFrame,
     return train, test
 
 
-def matrix_factorization(train: pd.DataFrame,
-                         test: pd.DataFrame,
-                         encode_col: List[str],
-                         n_components_lda: int = 5,
-                         n_components_svd: int = 3) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def matrix_factorization(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str], n_components_lda: int = 5, n_components_svd: int = 3
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Matrix factorization
 
     Args:
@@ -363,19 +359,24 @@ def matrix_factorization(train: pd.DataFrame,
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    cf = CategoryVectorizer(encode_col,
-                            n_components_lda,
-                            vectorizer=CountVectorizer(),
-                            transformer=LatentDirichletAllocation(n_components=n_components_lda,
-                                                                  n_jobs=-1, learning_method='online', random_state=777),
-                            name='CountLDA')
+    cf = CategoryVectorizer(
+        encode_col,
+        n_components_lda,
+        vectorizer=CountVectorizer(),
+        transformer=LatentDirichletAllocation(
+            n_components=n_components_lda, n_jobs=-1, learning_method="online", random_state=777
+        ),
+        name="CountLDA",
+    )
     features_lda = cf.transform(train).astype(np.float32)
 
-    cf = CategoryVectorizer(encode_col,
-                            n_components_svd,
-                            vectorizer=CountVectorizer(),
-                            transformer=TruncatedSVD(n_components=n_components_svd, random_state=777),
-                            name='CountSVD')
+    cf = CategoryVectorizer(
+        encode_col,
+        n_components_svd,
+        vectorizer=CountVectorizer(),
+        transformer=TruncatedSVD(n_components=n_components_svd, random_state=777),
+        name="CountSVD",
+    )
     features_svd = cf.transform(train).astype(np.float32)
 
     train = pd.concat([train, features_svd, features_lda], axis=1)
@@ -384,9 +385,9 @@ def matrix_factorization(train: pd.DataFrame,
     return train, test
 
 
-def frequency_encoding(train: pd.DataFrame,
-                       test: pd.DataFrame,
-                       encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def frequency_encoding(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Frequency encoding
 
     Args:
@@ -401,18 +402,16 @@ def frequency_encoding(train: pd.DataFrame,
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
     for f in encode_col:
-        grouped = train.groupby(f).size().reset_index(name=f'fe_{f}')
-        train = train.merge(grouped, how='left', on=f)
-        train[f'fe_{f}'] = train[f'fe_{f}'] / train[f'fe_{f}'].count()
+        grouped = train.groupby(f).size().reset_index(name=f"fe_{f}")
+        train = train.merge(grouped, how="left", on=f)
+        train[f"fe_{f}"] = train[f"fe_{f}"] / train[f"fe_{f}"].count()
 
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
     return train, test
 
 
-def count_null(train: pd.DataFrame,
-               test: pd.DataFrame,
-               encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def count_null(train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Count NaN
 
     Args:
@@ -426,10 +425,10 @@ def count_null(train: pd.DataFrame,
     n_train = len(train)
     train = pd.concat([train, test], sort=False).reset_index(drop=True)
 
-    train['count_null'] = train.isnull().sum(axis=1)
+    train["count_null"] = train.isnull().sum(axis=1)
     for f in encode_col:
         if sum(train[f].isnull().astype(int)) > 0:
-            train[f'cn_{f}'] = train[f].isnull().astype(int)
+            train[f"cn_{f}"] = train[f].isnull().astype(int)
 
     test = train[n_train:].reset_index(drop=True)
     train = train[:n_train]
