@@ -25,6 +25,13 @@ runner.run_predict_cv()
 runner.submission()
 ```
 
+## Examples
+
+| Competition Name | Score (Rank) | Repository |
+| --- | --- | --- | 
+| [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | 0.76555 (-) | [Link](https://github.com/upura/ayniy-titanic) |
+
+
 ## Environment
 
 ```
