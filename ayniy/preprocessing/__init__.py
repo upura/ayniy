@@ -1,3 +1,5 @@
+from typing import List, Any
+
 from ayniy.preprocessing.xfeat_utils import xfeat_runner, xfeat_target_encoding
 from ayniy.preprocessing.tabular import (
     count_null,
@@ -11,7 +13,7 @@ from ayniy.preprocessing.tabular import (
     detect_delete_cols,
 )
 
-__all__ = [
+__all__: List[Any] = [
     xfeat_runner,
     xfeat_target_encoding,
     count_null,
