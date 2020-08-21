@@ -246,8 +246,8 @@ class Runner:
             logger.info(f"{self.run_name} - end prediction fold:{i_fold}")
             if show_feature_importance:
                 feature_importances = pd.concat(
-                    [feature_importances, model.feature_importance(X_test)], axis=0
-                )  # type: ignore
+                    [feature_importances, model.feature_importance(X_test)], axis=0  # type: ignore
+                )
 
         # 予測の平均値を出力する
         pred_avg = np.mean(preds, axis=0)
@@ -294,9 +294,9 @@ class Runner:
         """
         # ラン名、fold、モデルのクラスからモデルを作成する
         run_fold_name = f"{self.run_name}-{i_fold}"
-        return self.model_cls(
+        return self.model_cls(  # type: ignore
             run_fold_name, self.params, self.cols_definition["categorical_col"]
-        )  # type: ignore
+        )
 
     def load_index_fold(self, i_fold: int) -> List:
         """クロスバリデーションでのfoldを指定して対応するレコードのインデックスを返す
