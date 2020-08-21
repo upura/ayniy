@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Dict, Tuple, Any, List
 
 import matplotlib.pyplot as plt
 import mlflow
@@ -6,7 +6,13 @@ from mlflow import log_metric, log_param, log_artifact
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import log_loss, mean_absolute_error, roc_auc_score, mean_squared_error, average_precision_score
+from sklearn.metrics import (
+    log_loss,
+    mean_absolute_error,
+    roc_auc_score,
+    mean_squared_error,
+    average_precision_score,
+)
 
 from ayniy.model.model import Model
 from ayniy.utils import Logger, Data
@@ -34,7 +40,7 @@ models_map = {
 
 
 class Runner:
-    def __init__(self, configs: dict, cv):
+    def __init__(self, configs: Dict, cv) -> None:  # type: ignore
         self.exp_name = configs["exp_name"]
         self.run_name = configs["run_name"]
         self.run_id = None
@@ -55,7 +61,7 @@ class Runner:
         else:
             raise ValueError
 
-    def train_fold(self, i_fold: int):
+    def train_fold(self, i_fold: int) -> Tuple[Any, Any, Any, Any]:
         """クロスバリデーションでのfoldを指定して学習・評価を行う
 
         他のメソッドから呼び出すほか、単体でも確認やパラメータ調整に用いる
@@ -117,7 +123,7 @@ class Runner:
 
         # 学習を行う
         model = self.build_model(i_fold)
-        model.train(X_tr, y_tr, X_val, y_val, self.X_test)
+        model.train(X_tr, y_tr, X_val, y_val, self.X_test)  # type: ignore
 
         # バリデーションデータへの予測・評価を行う
         pred_val = model.predict(X_val)
@@ -208,7 +214,10 @@ class Runner:
         log_param("cv_strategy", str(self.cv))
         log_param("evaluation_metric", self.evaluation_metric)
         log_metric("cv_score", cv_score)
-        log_param("fold_scores", dict(zip([f"fold_{i}" for i in range(len(scores))], [round(s, 4) for s in scores])))
+        log_param(
+            "fold_scores",
+            dict(zip([f"fold_{i}" for i in range(len(scores))], [round(s, 4) for s in scores])),
+        )
         log_param("cols_definition", self.cols_definition)
         log_param("description", self.description)
         mlflow.end_run()
@@ -236,7 +245,9 @@ class Runner:
             preds.append(pred)
             logger.info(f"{self.run_name} - end prediction fold:{i_fold}")
             if show_feature_importance:
-                feature_importances = pd.concat([feature_importances, model.feature_importance(X_test)], axis=0)
+                feature_importances = pd.concat(
+                    [feature_importances, model.feature_importance(X_test)], axis=0  # type: ignore
+                )
 
         # 予測の平均値を出力する
         pred_avg = np.mean(preds, axis=0)
@@ -248,13 +259,23 @@ class Runner:
 
         # 特徴量の重要度
         if show_feature_importance:
-            aggs = feature_importances.groupby("Feature").mean().sort_values(by="importance", ascending=False)
+            aggs = (
+                feature_importances.groupby("Feature")
+                .mean()
+                .sort_values(by="importance", ascending=False)
+            )
             cols = aggs[:200].index
-            pd.DataFrame(aggs.index).to_csv(f"../output/importance/{self.run_name}-fi.csv", index=False)
+            pd.DataFrame(aggs.index).to_csv(
+                f"../output/importance/{self.run_name}-fi.csv", index=False
+            )
 
             best_features = feature_importances.loc[feature_importances.Feature.isin(cols)]
             plt.figure(figsize=(14, 26))
-            sns.barplot(x="importance", y="Feature", data=best_features.sort_values(by="importance", ascending=False))
+            sns.barplot(
+                x="importance",
+                y="Feature",
+                data=best_features.sort_values(by="importance", ascending=False),
+            )
             plt.title("LightGBM Features (averaged over folds)")
             plt.tight_layout()
             plt.savefig(f"../output/importance/{self.run_name}-fi.png")
@@ -273,9 +294,11 @@ class Runner:
         """
         # ラン名、fold、モデルのクラスからモデルを作成する
         run_fold_name = f"{self.run_name}-{i_fold}"
-        return self.model_cls(run_fold_name, self.params, self.cols_definition["categorical_col"])
+        return self.model_cls(  # type: ignore
+            run_fold_name, self.params, self.cols_definition["categorical_col"]
+        )
 
-    def load_index_fold(self, i_fold: int) -> np.array:
+    def load_index_fold(self, i_fold: int) -> List:
         """クロスバリデーションでのfoldを指定して対応するレコードのインデックスを返す
         :param i_fold: foldの番号
         :return: foldに対応するレコードのインデックス
@@ -283,11 +306,13 @@ class Runner:
         # 学習データ・バリデーションデータを分けるインデックスを返す
         # ここでは乱数を固定して毎回作成しているが、ファイルに保存する方法もある
         if "cv_y" in self.cols_definition:
-            return list(self.cv.split(self.X_train, self.X_train[self.cols_definition["cv_y"]]))[i_fold]
+            return list(self.cv.split(self.X_train, self.X_train[self.cols_definition["cv_y"]]))[
+                i_fold
+            ]
         else:
             return list(self.cv.split(self.X_train, self.y_train))[i_fold]
 
-    def submission(self):
+    def submission(self) -> None:
         pred = Data.load(f"../output/pred/{self.run_name}-test.pkl")
         sub = pd.read_csv(self.sample_submission)
         if self.advanced and "predict_exp" in self.advanced:
@@ -296,5 +321,5 @@ class Runner:
             sub[self.cols_definition["target_col"]] = pred
         sub.to_csv(f"../output/submissions/submission_{self.run_name}.csv", index=False)
 
-    def reset_mlflow(self):
+    def reset_mlflow(self) -> None:
         mlflow.end_run()

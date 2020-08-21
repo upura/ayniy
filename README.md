@@ -41,20 +41,15 @@ mlflow ui
 
 ## Test
 
-### pytest
-```
-cd tests
-pytest --cov=. --cov-report=html
-```
-
-### black
-```
-black . --line-length 120 --exclude="docs"
-```
-
-### flake8
-```
-flake8 . --max-line-length=120 --ignore=W503,E722
+```bash
+# pytest
+pytest tests/ --cov=. --cov-report=html
+# black
+black . --line-length 99 --exclude="docs"
+# flake8
+flake8 .
+# mypy
+mypy .
 ```
 
 ## Docs
