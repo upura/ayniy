@@ -30,3 +30,6 @@ jobs:
     - name: black
       run: |
         black . --line-length 99 --exclude="docs"
+    - name: mypy
+      run: |
+        mypy --disallow-untyped-defs --ignore-missing-imports .
