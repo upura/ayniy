@@ -11,7 +11,7 @@ mkdir output/submissions
 # template
 cp -r ../ayniy/ayniy/ ayniy/
 cp ../ayniy/.dockerignore .dockerignore
-cp ../ayniy/.flake8 .flake8
+cp ../ayniy/setup.cfg setup.cfg
 cp ../ayniy/.gitignore .gitignore
 cp ../ayniy/Dockerfile Dockerfile
 cp ../ayniy/docker-compose.yml docker-compose.yml
