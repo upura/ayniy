@@ -8,7 +8,17 @@ from ayniy.preprocessing import xfeat_runner, xfeat_target_encoding
 from ayniy.utils import FeatureStore
 
 
-categorical_cols = ["Type", "Breed1", "Breed2", "Gender", "Color1", "Color2", "Color3", "State", "RescuerID"]
+categorical_cols = [
+    "Type",
+    "Breed1",
+    "Breed2",
+    "Gender",
+    "Color1",
+    "Color2",
+    "Color3",
+    "State",
+    "RescuerID",
+]
 
 numerical_cols = [
     "Age",
@@ -34,7 +44,9 @@ def load_petfinder() -> pd.DataFrame:
         train = pd.read_csv("../input/petfinder-adoption-prediction/train/train.csv")
         test = pd.read_csv("../input/petfinder-adoption-prediction/test/test.csv")
 
-        xfeat.utils.compress_df(pd.concat([train, test], sort=False)).reset_index(drop=True).to_feather(filepath)
+        xfeat.utils.compress_df(pd.concat([train, test], sort=False)).reset_index(
+            drop=True
+        ).to_feather(filepath)
 
     return pd.read_feather(filepath)
 
@@ -77,7 +89,11 @@ if __name__ == "__main__":
 
     # ConcatCombination r=2 & CountEncoder
     xfeat_runner(
-        pipelines=[LabelEncoder(output_suffix=""), ConcatCombination(drop_origin=True, r=2), CountEncoder()],
+        pipelines=[
+            LabelEncoder(output_suffix=""),
+            ConcatCombination(drop_origin=True, r=2),
+            CountEncoder(),
+        ],
         input_df=train[categorical_cols],
         output_filename="../input/petfinder-adoption-prediction/ConcatCombinationCountEncoder.ftr",
     )

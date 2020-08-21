@@ -70,14 +70,20 @@ def test_matrix_factorization(load_titanic):
     encode_col = ["pclass", "sibsp"]
     n_components_lda = 3
     n_components_svd = 4
-    train_new, _ = matrix_factorization(train, test, encode_col, n_components_lda, n_components_svd)
+    train_new, _ = matrix_factorization(
+        train, test, encode_col, n_components_lda, n_components_svd
+    )
     assert len((set(train_new.columns) - set(train.columns))) > 0
 
 
 def test_aggregation(load_titanic):
     train, test = load_titanic
     groupby_dict = [
-        {"key": ["pclass"], "var": ["age", "fare"], "agg": ["mean", "sum", "median", "min", "max", "var", "std"]},
+        {
+            "key": ["pclass"],
+            "var": ["age", "fare"],
+            "agg": ["mean", "sum", "median", "min", "max", "var", "std"],
+        },
     ]
     nunique_dict = [
         {"key": ["pclass"], "var": ["sibsp"], "agg": ["nunique"]},
@@ -90,7 +96,9 @@ def test_detect_delete_cols(load_titanic):
     train, test = load_titanic
     escape_col = ["sex", "class", "who", "adult_male", "deck", "embark_town", "alive", "alone"]
     threshold = 0.1
-    unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(train, test, escape_col, threshold)
+    unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(
+        train, test, escape_col, threshold
+    )
     assert type(unique_cols) == list
     assert type(duplicated_cols) == list
     assert type(high_corr_cols) == list

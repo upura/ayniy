@@ -16,7 +16,9 @@ def xfeat_runner(pipelines: List, input_df: pd.DataFrame, output_filename: str) 
     """
     if not os.path.exists(output_filename):
         print("Processing ...", [p.__class__.__name__ for p in pipelines])
-        Pipeline(pipelines).fit_transform(input_df).reset_index(drop=True).to_feather(output_filename)
+        Pipeline(pipelines).fit_transform(input_df).reset_index(drop=True).to_feather(
+            output_filename
+        )
     else:
         print("Skip ...", [p.__class__.__name__ for p in pipelines])
 
@@ -31,4 +33,6 @@ def xfeat_target_encoding(target_col: str, input_df: pd.DataFrame, output_filena
     _train = encoder.fit_transform(_train)
     _test = encoder.transform(_test)
 
-    pd.concat([_train, _test], sort=False).drop(target_col, axis=1).reset_index(drop=True).to_feather(output_filename)
+    pd.concat([_train, _test], sort=False).drop(target_col, axis=1).reset_index(
+        drop=True
+    ).to_feather(output_filename)
