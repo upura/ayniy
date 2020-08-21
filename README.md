@@ -47,7 +47,7 @@ cd tests
 pytest --cov=. --cov-report=html
 
 # black
-black . --line-length 120 --exclude="docs"
+black . --line-length 99 --exclude="docs"
 
 # flake8
 flake8 .
