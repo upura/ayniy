@@ -122,7 +122,7 @@ class FeatureStore:
     def __init__(self, feature_names: str, target_col: str) -> None:
         self.feature_names = feature_names
         self.target_col = target_col
-        _res = pd.concat([pd.read_feather(f) for f in feature_names])
+        _res = pd.concat([pd.read_feather(f) for f in feature_names], axis=1)
 
         _train = _res.dropna(subset=[target_col]).copy()
         _test = _res.loc[_res[target_col].isnull()].copy()
