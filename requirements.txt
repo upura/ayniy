@@ -2,6 +2,7 @@ allennlp==v1.0.0
 black==19.10b0
 catalyst==20.6.0
 chakin==0.0.8
+flake8-isort==4.0.0
 ja-sentence-segmenter==0.0.2
 japanize-matplotlib==1.1.2
 konoha[all]==4.6.1

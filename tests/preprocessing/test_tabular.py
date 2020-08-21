@@ -1,19 +1,12 @@
 import datetime
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from ayniy.preprocessing import (
-    count_null,
-    frequency_encoding,
-    matrix_factorization,
-    aggregation,
-    standerize,
-    fillna,
-    datetime_parser,
-    circle_encoding,
-    detect_delete_cols,
-)
+from ayniy.preprocessing import (aggregation, circle_encoding, count_null,
+                                 datetime_parser, detect_delete_cols, fillna,
+                                 frequency_encoding, matrix_factorization,
+                                 standerize)
 
 
 def test_count_null(load_titanic):

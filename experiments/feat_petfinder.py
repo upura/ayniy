@@ -2,11 +2,11 @@ import os
 
 import pandas as pd
 import xfeat
-from xfeat import ArithmeticCombinations, LabelEncoder, CountEncoder, ConcatCombination
+from xfeat import (ArithmeticCombinations, ConcatCombination, CountEncoder,
+                   LabelEncoder)
 
 from ayniy.preprocessing import xfeat_runner, xfeat_target_encoding
 from ayniy.utils import FeatureStore
-
 
 categorical_cols = [
     "Type",

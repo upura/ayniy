@@ -1,31 +1,19 @@
-from typing import Union, Dict, Tuple, Any, List
+from typing import Any, Dict, List, Tuple, Union
 
 import matplotlib.pyplot as plt
 import mlflow
-from mlflow import log_metric, log_param, log_artifact
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.metrics import (
-    log_loss,
-    mean_absolute_error,
-    roc_auc_score,
-    mean_squared_error,
-    average_precision_score,
-)
+from mlflow import log_artifact, log_metric, log_param
+from sklearn.metrics import (average_precision_score, log_loss,
+                             mean_absolute_error, mean_squared_error,
+                             roc_auc_score)
 
+from ayniy.model import (ModelCatClassifier, ModelCatRegressor, ModelFocalLGBM,
+                         ModelLGBM, ModelOptunaLGBM, ModelRIDGE, ModelXGB)
 from ayniy.model.model import Model
-from ayniy.utils import Logger, Data
-from ayniy.model import (
-    ModelLGBM,
-    ModelOptunaLGBM,
-    ModelFocalLGBM,
-    ModelCatRegressor,
-    ModelCatClassifier,
-    ModelXGB,
-    ModelRIDGE,
-)
-
+from ayniy.utils import Data, Logger
 
 logger = Logger()
 models_map = {
