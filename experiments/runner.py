@@ -1,16 +1,15 @@
-"""
-cd experiments
-python runner.py --run configs/run000.yml
-"""
-import yaml
 import argparse
 
+import yaml
 from sklearn.model_selection import StratifiedKFold
 
 from ayniy.model.runner import Runner
 
-
 if __name__ == "__main__":
+    """
+    cd experiments
+    python runner.py --run configs/run000.yml
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--run")
     args = parser.parse_args()

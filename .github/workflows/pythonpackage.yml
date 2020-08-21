@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 black mypy
+        pip install flake8 black mypy flake8-isort
     - name: Lint with flake8
       run: |
         flake8 . --max-line-length=99 --ignore=W503,E722
