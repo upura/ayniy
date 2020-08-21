@@ -9,7 +9,9 @@ on:
 jobs:
   build:
 
+    runs-on: ubuntu-latest
     container:
+
       image: gcr.io/kaggle-images/python:v76
       ports:
         - 8080
