@@ -17,9 +17,6 @@ jobs:
         - 8080
       volumes:
         - $PWD:/working
-      working_dir: /working
-      environment:
-        - PYTHONPATH=/working
       tty: true  
 
     steps:
