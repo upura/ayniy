@@ -5,6 +5,7 @@ import os
 import random
 import sys
 import time
+from typing import Any, Dict, List
 
 import joblib
 import numpy as np
@@ -12,17 +13,15 @@ import pandas as pd
 import torch
 
 
-def seed_everything(seed=777):
+def seed_everything(seed: int = 777) -> None:
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
 
 
 @contextmanager
-def timer(name):
+def timer(name: str) -> Any:
     t0 = time.time()
     yield
     print(f"[{name}] done in {time.time() - t0:.0f} s")
@@ -30,16 +29,16 @@ def timer(name):
 
 class Data:
     @classmethod
-    def dump(cls, value, path):
+    def dump(cls, value: Any, path: str) -> None:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         joblib.dump(value, path, compress=True)
 
     @classmethod
-    def load(cls, path):
+    def load(cls, path: str) -> Any:
         return joblib.load(path)
 
 
-def reduce_mem_usage(df):
+def reduce_mem_usage(df: pd.DataFrame) -> pd.DataFrame:
     """ iterate through all the columns of a dataframe and modify the data type
         to reduce memory usage.
     """
@@ -79,7 +78,7 @@ def reduce_mem_usage(df):
 
 
 class Logger:
-    def __init__(self):
+    def __init__(self) -> None:
         self.general_logger = logging.getLogger("general")
         self.result_logger = logging.getLogger("result")
         stream_handler = logging.StreamHandler(stream=sys.stdout)
@@ -93,17 +92,17 @@ class Logger:
             self.result_logger.addHandler(file_result_handler)
             self.result_logger.setLevel(logging.INFO)
 
-    def info(self, message):
+    def info(self, message: str) -> None:
         # 時刻をつけてコンソールとログに出力
         self.general_logger.info("[{}] - {}".format(self.now_string(), message))
 
-    def result(self, message):
+    def result(self, message: str) -> None:
         self.result_logger.info(message)
 
-    def result_ltsv(self, dic):
+    def result_ltsv(self, dic: Dict) -> None:
         self.result(self.to_ltsv(dic))
 
-    def result_scores(self, run_name, scores):
+    def result_scores(self, run_name: str, scores: List) -> None:
         # 計算結果をコンソールと計算結果用ログに出力
         dic = dict()
         dic["name"] = run_name
@@ -112,22 +111,18 @@ class Logger:
             dic[f"score{i}"] = score
         self.result(self.to_ltsv(dic))
 
-    def now_string(self):
+    def now_string(self) -> str:
         return str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    def to_ltsv(self, dic):
+    def to_ltsv(self, dic: Dict) -> str:
         return "\t".join(["{}:{}".format(key, value) for key, value in dic.items()])
 
 
 class FeatureStore:
-    def __init__(self, feature_names, target_col: str):
+    def __init__(self, feature_names: str, target_col: str) -> None:
         self.feature_names = feature_names
         self.target_col = target_col
-
-        _res = []
-        for f in feature_names:
-            _res.append(pd.read_feather(f))
-        _res = pd.concat(_res)
+        _res = pd.concat([pd.read_feather(f) for f in feature_names])
 
         _train = _res.dropna(subset=[target_col]).copy()
         _test = _res.loc[_res[target_col].isnull()].copy()
