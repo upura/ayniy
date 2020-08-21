@@ -9,10 +9,16 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8]
+    container:
+      image: gcr.io/kaggle-images/python:v76
+      ports:
+        - 8080
+      volumes:
+        - $PWD:/working
+      working_dir: /working
+      environment:
+        - PYTHONPATH=/working
+      tty: true  
 
     steps:
     - uses: actions/checkout@v2
