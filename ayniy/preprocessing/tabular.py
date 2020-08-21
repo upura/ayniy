@@ -1,5 +1,5 @@
 import itertools
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 def detect_delete_cols(
     train: pd.DataFrame, test: pd.DataFrame, escape_col: List[str], threshold: float
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[List, List, List]:
     """Detect unnecessary columns for deleting
 
     Args:
@@ -20,7 +20,7 @@ def detect_delete_cols(
         threshold (float): deleting threshold for correlations of columns
 
     Returns:
-        Tuple[pd.DataFrame, pd.DataFrame]: train, test
+        Tuple[List, List, List]: unique_cols, duplicated_cols, high_corr_cols
     """
     unique_cols = list(train.columns[train.nunique() == 1])
     duplicated_cols = list(train.columns[train.T.duplicated()])
@@ -31,18 +31,28 @@ def detect_delete_cols(
     try:
         for feat_a in [x for x in train.columns if x not in escape_col]:
             for feat_b in [x for x in train.columns if x not in escape_col]:
-                if feat_a != feat_b and feat_a not in high_corr_cols and feat_b not in high_corr_cols:
+                if (
+                    feat_a != feat_b
+                    and feat_a not in high_corr_cols
+                    and feat_b not in high_corr_cols
+                ):
                     c = buf.loc[feat_a, feat_b]
                     if c > threshold:
                         counter += 1
                         high_corr_cols.append(feat_b)
-                        print("{}: FEAT_A: {} FEAT_B: {} - Correlation: {}".format(counter, feat_a, feat_b, c))
+                        print(
+                            "{}: FEAT_A: {} FEAT_B: {} - Correlation: {}".format(
+                                counter, feat_a, feat_b, c
+                            )
+                        )
     except:
         pass
     return unique_cols, duplicated_cols, high_corr_cols
 
 
-def standerize(train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def standerize(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Standerization
 
     Args:
@@ -138,10 +148,10 @@ def circle_encoding(
 
 
 class GroupbyTransformer:
-    def __init__(self, param_dict=None):
+    def __init__(self, param_dict: Dict = None) -> None:
         self.param_dict = param_dict
 
-    def _get_params(self, p_dict):
+    def _get_params(self, p_dict: Dict):
         key = p_dict["key"]
         if "var" in p_dict.keys():
             var = p_dict["var"]
@@ -157,7 +167,7 @@ class GroupbyTransformer:
             on = key
         return key, var, agg, on
 
-    def _aggregate(self, dataframe):
+    def _aggregate(self, dataframe: pd.DataFrame) -> None:
         self.features = []
         for param_dict in self.param_dict:
             key, var, agg, on = self._get_params(param_dict)
@@ -166,9 +176,8 @@ class GroupbyTransformer:
             features = dataframe[all_features].groupby(key)[var].agg(agg).reset_index()
             features.columns = key + new_features
             self.features.append(features)
-        return self
 
-    def _merge(self, dataframe, merge=True):
+    def _merge(self, dataframe: pd.DataFrame, merge: bool = True) -> pd.DataFrame:
         for param_dict, features in zip(self.param_dict, self.features):
             key, var, agg, on = self._get_params(param_dict)
             if merge:
@@ -178,7 +187,7 @@ class GroupbyTransformer:
                 dataframe = pd.concat([dataframe, features[new_features]], axis=1)
         return dataframe
 
-    def transform(self, dataframe):
+    def transform(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         self._aggregate(dataframe)
         return self._merge(dataframe, merge=True)
 
@@ -191,25 +200,25 @@ class GroupbyTransformer:
                 _agg.append(a)
         return ["_".join([a, v, "groupby"] + key) for v in var for a in _agg]
 
-    def get_feature_names(self):
+    def get_feature_names(self) -> str:
         self.feature_names = []
         for param_dict in self.param_dict:
             key, var, agg, on = self._get_params(param_dict)
             self.feature_names += self._get_feature_names(key, var, agg)
         return self.feature_names
 
-    def get_numerical_features(self):
+    def get_numerical_features(self) -> str:
         return self.get_feature_names()
 
 
 class DiffGroupbyTransformer(GroupbyTransformer):
-    def _aggregate(self):
+    def _aggregate(self) -> None:
         raise NotImplementedError
 
-    def _merge(self):
+    def _merge(self) -> None:
         raise NotImplementedError
 
-    def transform(self, dataframe):
+    def transform(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         for param_dict in self.param_dict:
             key, var, agg, on = self._get_params(param_dict)
             for a in agg:
@@ -230,13 +239,13 @@ class DiffGroupbyTransformer(GroupbyTransformer):
 
 
 class RatioGroupbyTransformer(GroupbyTransformer):
-    def _aggregate(self):
+    def _aggregate(self) -> None:
         raise NotImplementedError
 
-    def _merge(self):
+    def _merge(self) -> None:
         raise NotImplementedError
 
-    def transform(self, dataframe):
+    def transform(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         for param_dict in self.param_dict:
             key, var, agg, on = self._get_params(param_dict)
             for a in agg:
@@ -259,19 +268,19 @@ class RatioGroupbyTransformer(GroupbyTransformer):
 class CategoryVectorizer:
     def __init__(
         self,
-        categorical_columns,
-        n_components,
+        categorical_columns: List[str],
+        n_components: int,
         vectorizer=CountVectorizer(),
         transformer=LatentDirichletAllocation(),
-        name="CountLDA",
-    ):
+        name: str = "CountLDA",
+    ) -> None:
         self.categorical_columns = categorical_columns
         self.n_components = n_components
         self.vectorizer = vectorizer
         self.transformer = transformer
         self.name = name + str(self.n_components)
 
-    def transform(self, dataframe):
+    def transform(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         features = []
         for (col1, col2) in self.get_column_pairs():
             try:
@@ -301,7 +310,11 @@ class CategoryVectorizer:
         return pd.DataFrame(data=features, columns=self.columns)
 
     def get_column_pairs(self):
-        return [(col1, col2) for col1, col2 in itertools.product(self.categorical_columns, repeat=2) if col1 != col2]
+        return [
+            (col1, col2)
+            for col1, col2 in itertools.product(self.categorical_columns, repeat=2)
+            if col1 != col2
+        ]
 
     def get_numerical_features(self):
         return self.columns
@@ -342,7 +355,11 @@ def aggregation(
 
 
 def matrix_factorization(
-    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str], n_components_lda: int = 5, n_components_svd: int = 3
+    train: pd.DataFrame,
+    test: pd.DataFrame,
+    encode_col: List[str],
+    n_components_lda: int = 5,
+    n_components_svd: int = 3,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Matrix factorization
 
@@ -411,7 +428,9 @@ def frequency_encoding(
     return train, test
 
 
-def count_null(train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def count_null(
+    train: pd.DataFrame, test: pd.DataFrame, encode_col: List[str]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Count NaN
 
     Args:
