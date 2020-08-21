@@ -1,12 +1,14 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional
+from typing import Optional, List
 
 import pandas as pd
 import numpy as np
 
 
 class Model(metaclass=ABCMeta):
-    def __init__(self, run_fold_name: str, params: dict, categorical_features=None) -> None:
+    def __init__(
+        self, run_fold_name: str, params: dict, categorical_features: List = None
+    ) -> None:
         self.run_fold_name = run_fold_name
         self.params = params
         self.model = None
@@ -14,7 +16,11 @@ class Model(metaclass=ABCMeta):
 
     @abstractmethod
     def train(
-        self, tr_x: pd.DataFrame, tr_y: pd.Series, va_x: Optional[pd.DataFrame] = None, va_y: Optional[pd.Series] = None
+        self,
+        tr_x: pd.DataFrame,
+        tr_y: pd.Series,
+        va_x: Optional[pd.DataFrame] = None,
+        va_y: Optional[pd.Series] = None,
     ) -> None:
         """モデルの学習を行い、学習済のモデルを保存する
 
@@ -26,7 +32,7 @@ class Model(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def predict(self, te_x: pd.DataFrame) -> np.array:
+    def predict(self, te_x: pd.DataFrame) -> np.ndarray:
         """学習済のモデルでの予測値を返す
 
         :param te_x: バリデーションデータやテストデータの特徴量
