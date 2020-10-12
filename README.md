@@ -31,6 +31,7 @@ runner.submission()
 | --- | --- | --- | 
 | [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | 0.76555 (-) | [Link](https://github.com/upura/ayniy-titanic) |
 | [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 0.871700 (1) | [Link](https://github.com/upura/basketball-behavior-challenge) |
+| [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
 
 ## Environment
 
