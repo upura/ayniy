@@ -23,7 +23,9 @@ def xfeat_runner(pipelines: List, input_df: pd.DataFrame, output_filename: str) 
         print("Skip ...", [p.__class__.__name__ for p in pipelines])
 
 
-def xfeat_target_encoding(target_col: str, input_df: pd.DataFrame, output_filename: str) -> None:
+def xfeat_target_encoding(
+    target_col: str, input_df: pd.DataFrame, output_filename: str
+) -> None:
 
     _train = input_df.dropna(subset=[target_col]).copy()
     _test = input_df.loc[input_df[target_col].isnull()].copy()

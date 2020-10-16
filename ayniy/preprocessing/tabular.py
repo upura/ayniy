@@ -191,7 +191,9 @@ class GroupbyTransformer:
         self._aggregate(dataframe)
         return self._merge(dataframe, merge=True)
 
-    def _get_feature_names(self, key: List[str], var: List[str], agg: List[str]) -> List[str]:
+    def _get_feature_names(
+        self, key: List[str], var: List[str], agg: List[str]
+    ) -> List[str]:
         _agg = []
         for a in agg:
             if not isinstance(a, str):
@@ -228,7 +230,9 @@ class DiffGroupbyTransformer(GroupbyTransformer):
                     dataframe[new_feature] = dataframe[base_feature] - dataframe[v]
         return dataframe
 
-    def _get_feature_names(self, key: List[str], var: List[str], agg: List[str]) -> List[str]:
+    def _get_feature_names(
+        self, key: List[str], var: List[str], agg: List[str]
+    ) -> List[str]:
         _agg = []
         for a in agg:
             if not isinstance(a, str):
@@ -255,7 +259,9 @@ class RatioGroupbyTransformer(GroupbyTransformer):
                     dataframe[new_feature] = dataframe[v] / dataframe[base_feature]
         return dataframe
 
-    def _get_feature_names(self, key: List[str], var: List[str], agg: List[str]) -> List[str]:
+    def _get_feature_names(
+        self, key: List[str], var: List[str], agg: List[str]
+    ) -> List[str]:
         _agg = []
         for a in agg:
             if not isinstance(a, str):
@@ -287,14 +293,18 @@ class CategoryVectorizer:
                 sentence = self.create_word_list(dataframe, col1, col2)
                 sentence = self.vectorizer.fit_transform(sentence)
                 feature = self.transformer.fit_transform(sentence)
-                feature = self.get_feature(dataframe, col1, col2, feature, name=self.name)
+                feature = self.get_feature(
+                    dataframe, col1, col2, feature, name=self.name
+                )
                 features.append(feature)
             except:
                 pass
         features = pd.concat(features, axis=1)
         return features
 
-    def create_word_list(self, dataframe: pd.DataFrame, col1: str, col2: str) -> List[str]:
+    def create_word_list(
+        self, dataframe: pd.DataFrame, col1: str, col2: str
+    ) -> List[str]:
         col1_size = int(dataframe[col1].values.max() + 1)
         col2_list: List[List] = [[] for _ in range(col1_size)]
         for val1, val2 in zip(dataframe[col1].values, dataframe[col2].values):
@@ -310,7 +320,9 @@ class CategoryVectorizer:
         name: str = "",
     ) -> pd.DataFrame:
         features = np.zeros(shape=(len(dataframe), self.n_components), dtype=np.float32)
-        self.columns = ["_".join([name, col1, col2, str(i)]) for i in range(self.n_components)]
+        self.columns = [
+            "_".join([name, col1, col2, str(i)]) for i in range(self.n_components)
+        ]
         for i, val1 in enumerate(dataframe[col1]):
             features[i, : self.n_components] = latent_vector[val1]
 
@@ -388,7 +400,10 @@ def matrix_factorization(
         n_components_lda,
         vectorizer=CountVectorizer(),
         transformer=LatentDirichletAllocation(
-            n_components=n_components_lda, n_jobs=-1, learning_method="online", random_state=777
+            n_components=n_components_lda,
+            n_jobs=-1,
+            learning_method="online",
+            random_state=777,
         ),
         name="CountLDA",
     )
