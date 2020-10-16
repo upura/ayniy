@@ -44,7 +44,7 @@ docker exec -it ayniy-test bash
 
 ```
 cd experiments
-mlflow ui
+mlflow ui -h 0.0.0.0
 ```
 
 ## Test
@@ -53,7 +53,7 @@ mlflow ui
 # pytest
 pytest tests/ --cov=. --cov-report=html
 # black
-black . --line-length 99 --exclude="docs"
+black .
 # flake8
 flake8 .
 # mypy

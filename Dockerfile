@@ -1,4 +1,4 @@
-FROM gcr.io/kaggle-images/python:v76
+FROM gcr.io/kaggle-images/python:v88
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 COPY requirements.txt .

@@ -6,12 +6,23 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from mlflow import log_artifact, log_metric, log_param
-from sklearn.metrics import (average_precision_score, log_loss,
-                             mean_absolute_error, mean_squared_error,
-                             roc_auc_score)
+from sklearn.metrics import (
+    average_precision_score,
+    log_loss,
+    mean_absolute_error,
+    mean_squared_error,
+    roc_auc_score,
+)
 
-from ayniy.model import (ModelCatClassifier, ModelCatRegressor, ModelFocalLGBM,
-                         ModelLGBM, ModelOptunaLGBM, ModelRIDGE, ModelXGB)
+from ayniy.model import (
+    ModelCatClassifier,
+    ModelCatRegressor,
+    ModelFocalLGBM,
+    ModelLGBM,
+    ModelOptunaLGBM,
+    ModelRIDGE,
+    ModelXGB,
+)
 from ayniy.model.model import Model
 from ayniy.utils import Data, Logger
 
@@ -73,8 +84,12 @@ class Runner:
 
         # 残差でダウンサンプリング
         if self.advanced and "ResRunner" in self.advanced:
-            X_tr = X_tr.loc[(X_tr["res"] < self.advanced["ResRunner"]["res_threshold"]).values]
-            y_tr = y_tr.loc[(X_tr["res"] < self.advanced["ResRunner"]["res_threshold"]).values]
+            X_tr = X_tr.loc[
+                (X_tr["res"] < self.advanced["ResRunner"]["res_threshold"]).values
+            ]
+            y_tr = y_tr.loc[
+                (X_tr["res"] < self.advanced["ResRunner"]["res_threshold"]).values
+            ]
             print(X_tr.shape)
             X_tr.drop("res", axis=1, inplace=True)
             X_val.drop("res", axis=1, inplace=True)
@@ -204,7 +219,12 @@ class Runner:
         log_metric("cv_score", cv_score)
         log_param(
             "fold_scores",
-            dict(zip([f"fold_{i}" for i in range(len(scores))], [round(s, 4) for s in scores])),
+            dict(
+                zip(
+                    [f"fold_{i}" for i in range(len(scores))],
+                    [round(s, 4) for s in scores],
+                )
+            ),
         )
         log_param("cols_definition", self.cols_definition)
         log_param("description", self.description)
@@ -257,7 +277,9 @@ class Runner:
                 f"../output/importance/{self.run_name}-fi.csv", index=False
             )
 
-            best_features = feature_importances.loc[feature_importances.Feature.isin(cols)]
+            best_features = feature_importances.loc[
+                feature_importances.Feature.isin(cols)
+            ]
             plt.figure(figsize=(14, 26))
             sns.barplot(
                 x="importance",
@@ -294,9 +316,9 @@ class Runner:
         # 学習データ・バリデーションデータを分けるインデックスを返す
         # ここでは乱数を固定して毎回作成しているが、ファイルに保存する方法もある
         if "cv_y" in self.cols_definition:
-            return list(self.cv.split(self.X_train, self.X_train[self.cols_definition["cv_y"]]))[
-                i_fold
-            ]
+            return list(
+                self.cv.split(self.X_train, self.X_train[self.cols_definition["cv_y"]])
+            )[i_fold]
         else:
             return list(self.cv.split(self.X_train, self.y_train))[i_fold]
 

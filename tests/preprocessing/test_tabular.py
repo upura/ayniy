@@ -3,10 +3,17 @@ import datetime
 import numpy as np
 import pandas as pd
 
-from ayniy.preprocessing import (aggregation, circle_encoding, count_null,
-                                 datetime_parser, detect_delete_cols, fillna,
-                                 frequency_encoding, matrix_factorization,
-                                 standerize)
+from ayniy.preprocessing import (
+    aggregation,
+    circle_encoding,
+    count_null,
+    datetime_parser,
+    detect_delete_cols,
+    fillna,
+    frequency_encoding,
+    matrix_factorization,
+    standerize,
+)
 
 
 def test_count_null(load_titanic):
@@ -87,7 +94,16 @@ def test_aggregation(load_titanic):
 
 def test_detect_delete_cols(load_titanic):
     train, test = load_titanic
-    escape_col = ["sex", "class", "who", "adult_male", "deck", "embark_town", "alive", "alone"]
+    escape_col = [
+        "sex",
+        "class",
+        "who",
+        "adult_male",
+        "deck",
+        "embark_town",
+        "alive",
+        "alone",
+    ]
     threshold = 0.1
     unique_cols, duplicated_cols, high_corr_cols = detect_delete_cols(
         train, test, escape_col, threshold

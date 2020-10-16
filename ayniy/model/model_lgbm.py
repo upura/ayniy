@@ -24,10 +24,15 @@ class ModelLGBM(Model):
 
         # データのセット
         validation = va_x is not None
-        lgb_train = lgb.Dataset(tr_x, tr_y, categorical_feature=self.categorical_features)
+        lgb_train = lgb.Dataset(
+            tr_x, tr_y, categorical_feature=self.categorical_features
+        )
         if validation:
             lgb_eval = lgb.Dataset(
-                va_x, va_y, reference=lgb_train, categorical_feature=self.categorical_features
+                va_x,
+                va_y,
+                reference=lgb_train,
+                categorical_feature=self.categorical_features,
             )
 
         # ハイパーパラメータの設定
@@ -84,7 +89,10 @@ class ModelOptunaLGBM(Model):
         # データのセット
         validation = va_x is not None
         lgb_train = optuna_lgb.Dataset(
-            tr_x, tr_y, categorical_feature=self.categorical_features, free_raw_data=False
+            tr_x,
+            tr_y,
+            categorical_feature=self.categorical_features,
+            free_raw_data=False,
         )
         if validation:
             lgb_eval = optuna_lgb.Dataset(
@@ -104,7 +112,7 @@ class ModelOptunaLGBM(Model):
         # 学習
         if validation:
             early_stopping_rounds = params.pop("early_stopping_rounds")
-            self.model = optuna_lgb.train(
+            self.model = optuna_lgb.train(  # type: ignore
                 params,
                 lgb_train,
                 num_round,
@@ -115,7 +123,7 @@ class ModelOptunaLGBM(Model):
                 tuning_history=tuning_history,
             )
         else:
-            self.model = optuna_lgb.train(
+            self.model = optuna_lgb.train(  # type: ignore
                 params,
                 lgb_train,
                 num_round,
@@ -199,10 +207,15 @@ class ModelFocalLGBM(Model):
 
         # データのセット
         validation = va_x is not None
-        lgb_train = lgb.Dataset(tr_x, tr_y, categorical_feature=self.categorical_features)
+        lgb_train = lgb.Dataset(
+            tr_x, tr_y, categorical_feature=self.categorical_features
+        )
         if validation:
             lgb_eval = lgb.Dataset(
-                va_x, va_y, reference=lgb_train, categorical_feature=self.categorical_features
+                va_x,
+                va_y,
+                reference=lgb_train,
+                categorical_feature=self.categorical_features,
             )
 
         # ハイパーパラメータの設定
