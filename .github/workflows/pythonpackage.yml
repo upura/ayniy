@@ -26,7 +26,7 @@ jobs:
         pip install flake8==3.7.9 black==19.10b0 mypy==0.782 flake8-isort==4.0.0
     - name: Lint with flake8
       run:
-        flake8 . --max-line-length=99 --statistics=True --ignore=W503,E722,I001
+        flake8 . --max-line-length=99 --statistics --ignore=W503,E722,I001
     - name: black
       run:
         black . --line-length 99 --exclude="docs"
