@@ -29,7 +29,7 @@ jobs:
         black .
     - name: Lint with flake8
       run:
-        flake8 . --max-line-length=99 --statistics --ignore=W503,E722,I001 --exclude="docs"
+        flake8 . --max-line-length=99 --statistics --ignore=W503,E722,I001,I003,I004,I005 --exclude="docs"
     - name: mypy
       run:
         mypy --disallow-untyped-defs --ignore-missing-imports .
