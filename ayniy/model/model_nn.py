@@ -134,8 +134,8 @@ class ModelNN(oriModel):
     ) -> None:
         # データのセット・スケーリング
         numerical_features = [
-            c for c in tr_x.columns if c not in self.categorical_features
-        ]  # type: ignore
+            c for c in tr_x.columns if c not in self.categorical_features   # type: ignore
+        ]
         validation = va_x is not None
 
         # パラメータ
@@ -222,8 +222,8 @@ class ModelNN(oriModel):
 
     def predict(self, te_x: pd.DataFrame) -> np.ndarray:
         numerical_features = [
-            c for c in te_x.columns if c not in self.categorical_features
-        ]  # type: ignore
+            c for c in te_x.columns if c not in self.categorical_features   # type: ignore
+        ]
         te_x = get_keras_data(te_x, numerical_features, self.categorical_features)
         pred = self.model.predict(te_x)  # type: ignore
         return pred
