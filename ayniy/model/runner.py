@@ -19,6 +19,7 @@ from ayniy.model import (
     ModelCatRegressor,
     ModelFocalLGBM,
     ModelLGBM,
+    ModelNN,
     ModelOptunaLGBM,
     ModelRIDGE,
     ModelXGB,
@@ -28,13 +29,14 @@ from ayniy.utils import Data, Logger
 
 logger = Logger()
 models_map = {
-    "ModelLGBM": ModelLGBM,
-    "ModelOptunaLGBM": ModelOptunaLGBM,
-    "ModelFocalLGBM": ModelFocalLGBM,
-    "ModelCatRegressor": ModelCatRegressor,
     "ModelCatClassifier": ModelCatClassifier,
-    "ModelXGB": ModelXGB,
+    "ModelCatRegressor": ModelCatRegressor,
+    "ModelFocalLGBM": ModelFocalLGBM,
+    "ModelLGBM": ModelLGBM,
+    "ModelNN": ModelNN,
+    "ModelOptunaLGBM": ModelOptunaLGBM,
     "ModelRIDGE": ModelRIDGE,
+    "ModelXGB": ModelXGB,
 }
 
 
