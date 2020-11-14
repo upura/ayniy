@@ -44,9 +44,9 @@ class Runner:
         self.run_name = configs["run_name"]
         self.run_id = None
         self.fe_name = configs["fe_name"]
-        self.X_train = Data.load(f"../input/X_train_{configs['fe_name']}.pkl")
-        self.y_train = Data.load(f"../input/y_train_{configs['fe_name']}.pkl")
-        self.X_test = Data.load(f"../input/X_test_{configs['fe_name']}.pkl")
+        self.X_train = Data.load(f"../input/pickle/X_train_{configs['fe_name']}.pkl")
+        self.y_train = Data.load(f"../input/pickle/y_train_{configs['fe_name']}.pkl")
+        self.X_test = Data.load(f"../input/pickle/X_test_{configs['fe_name']}.pkl")
         self.evaluation_metric = configs["evaluation_metric"]
         self.params = configs["params"]
         self.cols_definition = configs["cols_definition"]
