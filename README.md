@@ -27,10 +27,11 @@ runner.submission()
 
 ## Examples
 
-| Competition Name | Score (Rank) | Repository |
+| Competition Name | Rank | Repository |
 | --- | --- | --- | 
-| [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | 0.76555 (-) | [Link](https://github.com/upura/ayniy-titanic) |
-| [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 0.871700 (1) | [Link](https://github.com/upura/basketball-behavior-challenge) |
+| [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | - | [Link](https://github.com/upura/ayniy-titanic) |
+| [YouTube動画視聴回数予測](https://prob.space/competitions/youtube-view-count) | 6 | [Link](https://github.com/upura/probspace-youtube) |
+| [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 1 | [Link](https://github.com/upura/basketball-behavior-challenge) |
 | [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
 
 ## Environment
