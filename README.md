@@ -33,6 +33,7 @@ runner.submission()
 | [YouTube動画視聴回数予測](https://prob.space/competitions/youtube-view-count) | 6 | [Link](https://github.com/upura/probspace-youtube) |
 | [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 1 | [Link](https://github.com/upura/basketball-behavior-challenge) |
 | [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
+| [#8 [初心者向] atmaCup](https://www.guruguru.science/competitions/13/) | - | [Link](https://github.com/upura/atmaCup8) |
 
 ## Environment
 
