@@ -18,6 +18,9 @@ cp ../ayniy/docker-compose.yml docker-compose.yml
 cp ../ayniy/requirements.txt requirements.txt
 cp ../ayniy/experiments/runner.py experiments/runner.py
 
+# kaggle_utils
+cp ../kaggle_utils/kaggle_utils/ kaggle_utils/
+
 # README.md and .gitkeep
 touch input/.gitkeep
 touch output/importance/.gitkeep
