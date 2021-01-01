@@ -35,16 +35,26 @@ runner.submission()
 | [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
 | [#8 [初心者向] atmaCup](https://www.guruguru.science/competitions/13/) | - | [Link](https://github.com/upura/atmaCup8) |
 
+## Starter Kit
+
+```bash
+mkdir project_dir
+cd project_dir
+sh start.sh
+```
+
+[kaggle_utils](https://github.com/upura/kaggle_utils/tree/update-refactoring) is used for feature engineering.
+
 ## Environment
 
-```
+```bash
 docker-compose -d --build
 docker exec -it ayniy-test bash
 ```
 
 ## MLflow
 
-```
+```bash
 cd experiments
 mlflow ui -h 0.0.0.0
 ```
@@ -64,13 +74,13 @@ mypy .
 
 ## Docs
 In container,
-```
+```bash
 cd docs
 make html
 ```
 
 Out of container,
-```
+```bash
 sh deploy.sh
 ```
 https://github.com/upura/ayniy-docs
