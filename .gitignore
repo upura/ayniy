@@ -12,6 +12,7 @@
 *.npy
 .vector_cache
 mlruns
+kaggle_utils
 
 # Created by https://www.gitignore.io/api/macos,images,python,jupyternotebooks
 # Edit at https://www.gitignore.io/?templates=macos,images,python,jupyternotebooks

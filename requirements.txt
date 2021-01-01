@@ -2,8 +2,10 @@ black==19.10b0
 flake8-isort==4.0.0
 ja-sentence-segmenter==0.0.2
 japanize-matplotlib==1.1.2
+kaggler==0.8.12
 konoha[all]==4.6.2
 mecab-python3==0.996.5
 mlflow==1.10.0
 mypy==0.782
 neologdn==0.4
+node2vec==0.4.0
