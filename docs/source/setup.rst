@@ -1,7 +1,7 @@
 Setup
 ===================================
 
-When you use local editor like VSCode, you should create a project folder.
+When you use local editor like VSCode, you should create a project folder as follows.
 
 .. code-block:: bash
 
@@ -16,7 +16,7 @@ You can use docker environment as follows.
    docker-compose -d --build
    docker exec -it {container_name} bash
 
-When you use notebook editor like Kaggle Notebook, you
+When you use notebook editor like Kaggle Notebook, you can install packages as follows.
 
 .. code-block:: bash
 
