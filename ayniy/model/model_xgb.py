@@ -36,6 +36,7 @@ class ModelXGB(Model):
                 params,
                 dtrain,
                 num_round,
+                verbose_eval=500,
                 evals=watchlist,
                 early_stopping_rounds=early_stopping_rounds,
             )

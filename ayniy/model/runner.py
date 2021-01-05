@@ -86,10 +86,10 @@ class Runner:
 
         # 残差でダウンサンプリング
         if self.advanced and "ResRunner" in self.advanced:
-            X_tr = X_tr.loc[
+            y_tr = y_tr.loc[
                 (X_tr["res"] < self.advanced["ResRunner"]["res_threshold"]).values
             ]
-            y_tr = y_tr.loc[
+            X_tr = X_tr.loc[
                 (X_tr["res"] < self.advanced["ResRunner"]["res_threshold"]).values
             ]
             print(X_tr.shape)
