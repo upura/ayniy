@@ -31,7 +31,7 @@ class ModelNN(oriModel):
     ) -> None:
         # データのセット・スケーリング
         numerical_features = [
-            c for c in tr_x.columns if c not in self.categorical_features   # type: ignore
+            c for c in tr_x.columns if c not in self.categorical_features  # type: ignore
         ]
         validation = va_x is not None
 
@@ -41,11 +41,6 @@ class ModelNN(oriModel):
         patience = self.params["patience"]
 
         # モデルの構築
-        model = keras.Sequential([
-            layers.Dense(64, activation='relu'),
-            layers.Dense(16, activation='relu'),
-            layers.Dense(1, activation='linear'),
-        ])
         inp_cats = []
         embs = []
         data = pd.concat([tr_x, va_x, te_x]).reset_index(drop=True)
@@ -69,9 +64,7 @@ class ModelNN(oriModel):
 
         model = kerasModel(inputs=[inp_numerical], outputs=out)
         model.compile(
-            optimizer='adam',
-            loss='mse',
-            metrics=[keras.metrics.RootMeanSquaredError()]
+            optimizer="adam", loss="mse", metrics=[keras.metrics.RootMeanSquaredError()]
         )
         batch_size = 256
 
@@ -80,21 +73,18 @@ class ModelNN(oriModel):
 
         if validation:
             early_stopping = keras.callbacks.EarlyStopping(
-                patience=patience,
-                min_delta=0.001,
-                restore_best_weights=True,
+                patience=patience, min_delta=0.001, restore_best_weights=True,
             )
             model.fit(
-                tr_x, tr_y,
+                tr_x,
+                tr_y,
                 validation_data=(va_x, va_y),
                 batch_size=batch_size,
                 epochs=nb_epoch,
                 callbacks=[early_stopping],
             )
         else:
-            model.fit(
-                tr_x, tr_y, batch_size=batch_size, nb_epoch=nb_epoch
-            )
+            model.fit(tr_x, tr_y, batch_size=batch_size, nb_epoch=nb_epoch)
         model.load_weights(f"../output/model/model_{self.run_fold_name}.hdf5")  # type: ignore
 
         # モデル・スケーラーの保持
@@ -102,7 +92,7 @@ class ModelNN(oriModel):
 
     def predict(self, te_x: pd.DataFrame) -> np.ndarray:
         numerical_features = [
-            c for c in te_x.columns if c not in self.categorical_features   # type: ignore
+            c for c in te_x.columns if c not in self.categorical_features  # type: ignore
         ]
         te_x = get_keras_data(te_x, numerical_features, self.categorical_features)
         pred = self.model.predict(te_x)  # type: ignore

@@ -38,7 +38,7 @@ class ModelCatClassifier(Model):
     def feature_importance(self, te_x: pd.DataFrame) -> pd.DataFrame:
         fold_importance_df = pd.DataFrame()
         fold_importance_df["Feature"] = te_x.columns.values
-        fold_importance_df["importance"] = self.model.feature_importances_     # type: ignore
+        fold_importance_df["importance"] = self.model.feature_importances_  # type: ignore
         return fold_importance_df
 
     def save_model(self) -> None:
@@ -81,7 +81,7 @@ class ModelCatRegressor(Model):
     def feature_importance(self, te_x: pd.DataFrame) -> pd.DataFrame:
         fold_importance_df = pd.DataFrame()
         fold_importance_df["Feature"] = te_x.columns.values
-        fold_importance_df["importance"] = self.model.feature_importances_     # type: ignore
+        fold_importance_df["importance"] = self.model.feature_importances_  # type: ignore
         return fold_importance_df
 
     def save_model(self) -> None:
