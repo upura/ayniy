@@ -1,5 +1,8 @@
 # directory
 mkdir input
+mkdir input/pickle
+mkdir input/feather
+mkdir input
 mkdir experiments
 mkdir output
 mkdir output/importance
@@ -22,7 +25,8 @@ cp ../ayniy/experiments/runner.py experiments/runner.py
 cp -r ../kaggle_utils/kaggle_utils/ kaggle_utils/
 
 # README.md and .gitkeep
-touch input/.gitkeep
+touch input/pickle/.gitkeep
+touch input/feather/.gitkeep
 touch output/importance/.gitkeep
 touch output/logs/.gitkeep
 touch output/model/.gitkeep
