@@ -8,7 +8,7 @@ from ayniy.utils import Data
 if __name__ == "__main__":
 
     fe_id = 'fe000'
-    fe_name = f'{fe_id}_nn'
+    fe_name = f'{fe_id}_nn_small'
 
     X_train = Data.load(f'../input/pickle/X_train_{fe_id}.pkl')
     y_train = Data.load(f'../input/pickle/y_train_{fe_id}.pkl')
@@ -29,6 +29,9 @@ if __name__ == "__main__":
     X_train.drop(del_col, axis=1, inplace=True)
     X_test.drop(del_col, axis=1, inplace=True)
     print(X_train.shape)
+
+    X_train = X_train.loc[:100]
+    y_train = y_train.loc[:100]
 
     Data.dump(X_train, f'../input/pickle/X_train_{fe_name}.pkl')
     Data.dump(y_train, f'../input/pickle/y_train_{fe_name}.pkl')
