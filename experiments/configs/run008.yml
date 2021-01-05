@@ -1,7 +1,7 @@
 description: Ridge
 exp_name: 'petfinder-adoption-prediction'
 run_name: 'run008'
-fe_name: 'fe000'
+fe_name: 'fe000_nn'
 data:
   sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
 cols_definition:

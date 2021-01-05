@@ -22,7 +22,6 @@ class ModelRIDGE(Model):
         params = dict(self.params)
         self.model: Ridge = Ridge(**params)
         self.model.fit(tr_x, tr_y)
-        print(self.model.coef_)
 
     def predict(self, te_x: pd.DataFrame) -> np.ndarray:
         return self.model.predict(te_x)
