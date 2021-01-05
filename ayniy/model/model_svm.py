@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.svm import SVC, SVR
+from sklearn.svm import SVC
 
 from ayniy.model.model import Model
 from ayniy.utils import Data
