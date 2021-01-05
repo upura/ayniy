@@ -1,0 +1,25 @@
+description: SVM
+exp_name: 'petfinder-adoption-prediction'
+run_name: 'run010'
+fe_name: 'fe000_nn_small'
+data:
+  sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
+cols_definition:
+  id_col: 'PetID'
+  target_col: 'AdoptionSpeed'
+  categorical_col: [
+    'Type',
+    'Breed1',
+    'Breed2',
+    'Gender',
+    'Color1',
+    'Color2',
+    'Color3',
+    'State',
+    'RescuerID'
+  ]
+model_name: 'ModelSVM'
+params: {
+  'random_state': 0
+}
+evaluation_metric: 'rmse'

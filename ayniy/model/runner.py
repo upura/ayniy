@@ -22,6 +22,7 @@ from ayniy.model import (
     ModelNN,
     ModelOptunaLGBM,
     ModelRIDGE,
+    ModelSVM,
     ModelXGB,
 )
 from ayniy.model.model import Model
@@ -36,6 +37,7 @@ models_map = {
     "ModelNN": ModelNN,
     "ModelOptunaLGBM": ModelOptunaLGBM,
     "ModelRIDGE": ModelRIDGE,
+    "ModelSVM": ModelSVM,
     "ModelXGB": ModelXGB,
 }
 
