@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 from ayniy.utils import Data
