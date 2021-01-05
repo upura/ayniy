@@ -1,7 +1,7 @@
-description: Ridge
+description: MLP
 exp_name: 'petfinder-adoption-prediction'
-run_name: 'run008'
-fe_name: 'fe000_nn'
+run_name: 'run012'
+fe_name: 'fe000_nn_small'
 data:
   sample_submission: '../input/petfinder-adoption-prediction/test/sample_submission.csv'
 cols_definition:
@@ -18,9 +18,8 @@ cols_definition:
     'State',
     'RescuerID'
   ]
-model_name: 'ModelRIDGE'
+model_name: 'ModelRFRegressor'
 params: {
-  'alpha': 100,
   'random_state': 0
 }
 evaluation_metric: 'rmse'

@@ -18,10 +18,14 @@ from ayniy.model import (
     ModelCatClassifier,
     ModelCatRegressor,
     ModelFocalLGBM,
+    ModelKNN,
     ModelLGBM,
     ModelNN,
     ModelOptunaLGBM,
+    ModelRFClassifier,
+    ModelRFRegressor,
     ModelRIDGE,
+    ModelSVM,
     ModelXGB,
 )
 from ayniy.model.model import Model
@@ -33,9 +37,13 @@ models_map = {
     "ModelCatRegressor": ModelCatRegressor,
     "ModelFocalLGBM": ModelFocalLGBM,
     "ModelLGBM": ModelLGBM,
+    "ModelKNN": ModelKNN,
     "ModelNN": ModelNN,
     "ModelOptunaLGBM": ModelOptunaLGBM,
+    "ModelRFClassifier": ModelRFClassifier,
+    "ModelRFRegressor": ModelRFRegressor,
     "ModelRIDGE": ModelRIDGE,
+    "ModelSVM": ModelSVM,
     "ModelXGB": ModelXGB,
 }
 

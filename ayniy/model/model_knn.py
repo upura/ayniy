@@ -2,13 +2,13 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import Ridge
+from sklearn.neighbors import KNeighborsClassifier
 
 from ayniy.model.model import Model
 from ayniy.utils import Data
 
 
-class ModelRIDGE(Model):
+class ModelKNN(Model):
     def train(
         self,
         tr_x: pd.DataFrame,
@@ -20,11 +20,11 @@ class ModelRIDGE(Model):
 
         # ハイパーパラメータの設定
         params = dict(self.params)
-        self.model: Ridge = Ridge(**params)
+        self.model: KNeighborsClassifier = KNeighborsClassifier(**params)
         self.model.fit(tr_x, tr_y)
 
     def predict(self, te_x: pd.DataFrame) -> np.ndarray:
-        return self.model.predict(te_x)
+        return self.model.predict_proba(te_x)[:, 1]
 
     def save_model(self) -> None:
         model_path = os.path.join("../output/model", f"{self.run_fold_name}.model")
