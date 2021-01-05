@@ -37,6 +37,8 @@ runner.submission()
 
 ## Starter Kit
 
+### Scripts
+
 ```bash
 mkdir project_dir
 cd project_dir
@@ -45,21 +47,36 @@ sh start.sh
 
 [kaggle_utils](https://github.com/upura/kaggle_utils/tree/update-refactoring) is used for feature engineering.
 
-## Environment
+#### Environment
 
 ```bash
 docker-compose -d --build
 docker exec -it ayniy-test bash
 ```
 
-## MLflow
+#### MLflow
 
 ```bash
 cd experiments
 mlflow ui -h 0.0.0.0
 ```
 
-## Test
+### Kaggle Notebook
+
+```bash
+!git clone https://github.com/upura/ayniy
+import sys
+sys.path.append("/kaggle/working/ayniy")
+!pip install -r /kaggle/working/ayniy/requirements.txt
+!mkdir '../output/'
+!mkdir '../output/logs'
+from sklearn.model_selection import StratifiedKFold
+from ayniy.model.runner import Runner
+```
+
+## For Developers
+
+### Test
 
 ```bash
 # pytest
@@ -72,7 +89,7 @@ flake8 .
 mypy .
 ```
 
-## Docs
+### Docs
 In container,
 ```bash
 cd docs
