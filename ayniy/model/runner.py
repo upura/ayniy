@@ -221,7 +221,7 @@ class Runner:
 
         # mlflow
         self.run_id = mlflow.active_run().info.run_id
-        log_param("model_name", self.model_cls.__class__.__name__)
+        log_param("model_name", str(self.model_cls).split(".")[-1][:-2])
         log_param("fe_name", self.fe_name)
         log_param("train_params", self.params)
         log_param("cv_strategy", str(self.cv))
@@ -250,7 +250,10 @@ class Runner:
         X_test = self.X_test
         preds = []
 
-        show_feature_importance = "LGBM" in str(self.model_cls)
+        show_feature_importance = str(self.model_cls).split(".")[-1][:-2] in (
+            "ModelLGBM",
+            "ModelRIDGE",
+        )
         if show_feature_importance:
             feature_importances = pd.DataFrame()
 
@@ -296,7 +299,7 @@ class Runner:
                 y="Feature",
                 data=best_features.sort_values(by="importance", ascending=False),
             )
-            plt.title("LightGBM Features (averaged over folds)")
+            plt.title("Features (averaged over folds)")
             plt.tight_layout()
             plt.savefig(f"../output/importance/{self.run_name}-fi.png")
             plt.show()

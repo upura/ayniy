@@ -48,6 +48,12 @@ class ModelXGB(Model):
         dtest = xgb.DMatrix(te_x)
         return self.model.predict(dtest, ntree_limit=self.model.best_ntree_limit)  # type: ignore
 
+    def feature_importance(self, te_x: pd.DataFrame) -> pd.DataFrame:
+        fold_importance_df = pd.DataFrame()
+        fold_importance_df["Feature"] = te_x.columns.values
+        fold_importance_df["importance"] = list(self.model.get_score(importance_type="gain").values())  # type: ignore
+        return fold_importance_df
+
     def save_model(self) -> None:
         model_path = os.path.join("../output/model", f"{self.run_fold_name}.model")
         os.makedirs(os.path.dirname(model_path), exist_ok=True)
