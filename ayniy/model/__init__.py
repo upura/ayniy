@@ -13,6 +13,7 @@ __all__: List[Any] = [
     ModelCatRegressor,
     ModelFocalLGBM,
     ModelLGBM,
+    ModelKNN,
     ModelNN,
     ModelOptunaLGBM,
     ModelRIDGE,
