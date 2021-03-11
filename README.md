@@ -27,14 +27,15 @@ runner.submission()
 
 ## Examples
 
-| Competition Name | Rank | Repository |
-| --- | --- | --- | 
-| [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | - | [Link](https://github.com/upura/ayniy-titanic) |
-| [YouTube動画視聴回数予測](https://prob.space/competitions/youtube-view-count) | 6 | [Link](https://github.com/upura/probspace-youtube) |
-| [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 1 | [Link](https://github.com/upura/basketball-behavior-challenge) |
-| [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
-| [#8 [初心者向] atmaCup](https://www.guruguru.science/competitions/13/) | - | [Link](https://github.com/upura/atmaCup8) |
-| [WiDS Datathon 2021](https://www.kaggle.com/c/widsdatathon2021) | 64 | [Link](https://github.com/upura/widsdatathon2021) |
+| Platform | Competition Name | Rank | Repository |
+| --- | --- | --- | --- | 
+| CodaLab | [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 1 | [Link](https://github.com/upura/basketball-behavior-challenge) |
+| Nishika| [財務・非財務情報を活用した株主価値予測](https://www.nishika.com/competitions/4/summary) | 2 | [Link](https://github.com/upura/nishika-yuho) |
+| SIGNATE | [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
+| ProbSpace | [YouTube動画視聴回数予測](https://prob.space/competitions/youtube-view-count) | 6 | [Link](https://github.com/upura/probspace-youtube) |
+| atmaCup | [#8 [初心者向] atmaCup](https://www.guruguru.science/competitions/13/) | - | [Link](https://github.com/upura/atmaCup8) |
+| Kaggle | [WiDS Datathon 2021](https://www.kaggle.com/c/widsdatathon2021) | 64 | [Link](https://github.com/upura/widsdatathon2021) |
+| Kaggle | [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | - | [Link](https://github.com/upura/ayniy-titanic) |
 
 ## Starter Kit
 
