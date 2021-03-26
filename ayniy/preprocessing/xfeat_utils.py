@@ -1,12 +1,14 @@
 import os
-from typing import List
+from typing import Any, List
 
 import pandas as pd
 from sklearn.model_selection import KFold
 from xfeat import Pipeline, TargetEncoder
 
 
-def xfeat_runner(pipelines: List, input_df: pd.DataFrame, output_filename: str) -> None:
+def xfeat_runner(
+    pipelines: List[Any], input_df: pd.DataFrame, output_filename: str
+) -> None:
     """Handling xfeat pipelines
 
     Args:

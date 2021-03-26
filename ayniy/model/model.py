@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,10 @@ import pandas as pd
 
 class Model(metaclass=ABCMeta):
     def __init__(
-        self, run_fold_name: str, params: dict, categorical_features: List = None
+        self,
+        run_fold_name: str,
+        params: Dict[Any, Any],
+        categorical_features: List[str] = list(),
     ) -> None:
         self.run_fold_name = run_fold_name
         self.params = params

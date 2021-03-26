@@ -17,7 +17,7 @@ def seed_everything(seed: int = 777) -> None:
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
-    torch.manual_seed(seed)
+    torch.manual_seed(seed)  # type: ignore
 
 
 @contextmanager
@@ -105,10 +105,10 @@ class Logger:
     def result(self, message: str) -> None:
         self.result_logger.info(message)
 
-    def result_ltsv(self, dic: Dict) -> None:
+    def result_ltsv(self, dic: Dict[Any, Any]) -> None:
         self.result(self.to_ltsv(dic))
 
-    def result_scores(self, run_name: str, scores: List) -> None:
+    def result_scores(self, run_name: str, scores: List[Any]) -> None:
         # 計算結果をコンソールと計算結果用ログに出力
         dic = dict()
         dic["name"] = run_name
@@ -120,7 +120,7 @@ class Logger:
     def now_string(self) -> str:
         return str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    def to_ltsv(self, dic: Dict) -> str:
+    def to_ltsv(self, dic: Dict[Any, Any]) -> str:
         return "\t".join(["{}:{}".format(key, value) for key, value in dic.items()])
 
 

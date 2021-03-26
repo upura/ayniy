@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import lightgbm as lgb
 import numpy as np
@@ -105,8 +105,8 @@ class ModelOptunaLGBM(Model):
         # ハイパーパラメータの設定
         params = dict(self.params)
         num_round = params.pop("num_boost_round")
-        best_params: Dict = dict()
-        tuning_history: List = list()
+        best_params: Dict[Any, Any] = dict()
+        tuning_history: List[Any] = list()
 
         # 学習
         if validation:
@@ -169,7 +169,7 @@ def focal_loss_lgb(y_pred, dtrain, alpha, gamma):  # type: ignore
         )
 
     def partial_fl(x):  # type: ignore
-        return fl(x, y_true)
+        return fl(x, y_true)  # type: ignore
 
     grad = derivative(partial_fl, y_pred, n=1, dx=1e-6)
     hess = derivative(partial_fl, y_pred, n=2, dx=1e-6)
@@ -199,10 +199,10 @@ class ModelFocalLGBM(Model):
         te_x: pd.DataFrame = None,
     ) -> None:
         def focal_loss(x, y):  # type: ignore
-            return focal_loss_lgb(x, y, alpha=0.25, gamma=1.0)
+            return focal_loss_lgb(x, y, alpha=0.25, gamma=1.0)  # type: ignore
 
         def focal_loss_eval(x, y):  # type: ignore
-            return focal_loss_lgb_eval_error(x, y, alpha=0.25, gamma=1.0)
+            return focal_loss_lgb_eval_error(x, y, alpha=0.25, gamma=1.0)  # type: ignore
 
         # データのセット
         validation = va_x is not None

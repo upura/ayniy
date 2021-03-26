@@ -320,7 +320,7 @@ class Runner:
             run_fold_name, self.params, self.cols_definition["categorical_col"]
         )
 
-    def load_index_fold(self, i_fold: int) -> List:
+    def load_index_fold(self, i_fold: int) -> np.array:
         """クロスバリデーションでのfoldを指定して対応するレコードのインデックスを返す
         :param i_fold: foldの番号
         :return: foldに対応するレコードのインデックス

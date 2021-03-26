@@ -1,5 +1,5 @@
 import itertools
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 def detect_delete_cols(
     train: pd.DataFrame, test: pd.DataFrame, escape_col: List[str], threshold: float
-) -> Tuple[List, List, List]:
+) -> Tuple[List[str], List[str], List[str]]:
     """Detect unnecessary columns for deleting
 
     Args:
@@ -148,10 +148,12 @@ def circle_encoding(
 
 
 class GroupbyTransformer:
-    def __init__(self, param_dict: Dict) -> None:
+    def __init__(self, param_dict: Dict[Any, Any]) -> None:
         self.param_dict = param_dict
 
-    def _get_params(self, p_dict: Dict) -> Tuple[List, List, List, List]:
+    def _get_params(
+        self, p_dict: Dict[Any, Any]
+    ) -> Tuple[List[str], List[str], List[str], List[str]]:
         key = p_dict["key"]
         if "var" in p_dict.keys():
             var = p_dict["var"]
@@ -197,7 +199,7 @@ class GroupbyTransformer:
         _agg = []
         for a in agg:
             if not isinstance(a, str):
-                _agg.append(a.__name__)
+                _agg.append(a.__name__)  # type: ignore
             else:
                 _agg.append(a)
         return ["_".join([a, v, "groupby"] + key) for v in var for a in _agg]
@@ -236,7 +238,7 @@ class DiffGroupbyTransformer(GroupbyTransformer):
         _agg = []
         for a in agg:
             if not isinstance(a, str):
-                _agg.append(a.__name__)
+                _agg.append(a.__name__)  # type: ignore
             else:
                 _agg.append(a)
         return ["_".join(["diff", a, v, "groupby"] + key) for v in var for a in _agg]
@@ -265,7 +267,7 @@ class RatioGroupbyTransformer(GroupbyTransformer):
         _agg = []
         for a in agg:
             if not isinstance(a, str):
-                _agg.append(a.__name__)
+                _agg.append(a.__name__)  # type: ignore
             else:
                 _agg.append(a)
         return ["_".join(["ratio", a, v, "groupby"] + key) for v in var for a in _agg]
@@ -306,7 +308,7 @@ class CategoryVectorizer:
         self, dataframe: pd.DataFrame, col1: str, col2: str
     ) -> List[str]:
         col1_size = int(dataframe[col1].values.max() + 1)
-        col2_list: List[List] = [[] for _ in range(col1_size)]
+        col2_list: List[List[str]] = [[] for _ in range(col1_size)]
         for val1, val2 in zip(dataframe[col1].values, dataframe[col2].values):
             col2_list[int(val1)].append(col2 + str(val2))
         return [" ".join(map(str, ls)) for ls in col2_list]
@@ -340,7 +342,10 @@ class CategoryVectorizer:
 
 
 def aggregation(
-    train: pd.DataFrame, test: pd.DataFrame, groupby_dict: dict, nunique_dict: dict
+    train: pd.DataFrame,
+    test: pd.DataFrame,
+    groupby_dict: Dict[Any, Any],
+    nunique_dict: Dict[Any, Any],
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Aggregation
 

@@ -30,7 +30,7 @@ class ModelNN(oriModel):
     ) -> None:
         # データのセット・スケーリング
         numerical_features = [
-            c for c in tr_x.columns if c not in self.categorical_features  # type: ignore
+            c for c in tr_x.columns if c not in self.categorical_features
         ]
         validation = va_x is not None
 
@@ -44,7 +44,7 @@ class ModelNN(oriModel):
         embs = []
         data = pd.concat([tr_x, va_x, te_x]).reset_index(drop=True)
 
-        for c in self.categorical_features:  # type: ignore
+        for c in self.categorical_features:
             inp_cat = layers.Input(shape=[1], name=c)
             inp_cats.append(inp_cat)
             embs.append((layers.Embedding(data[c].max() + 1, 4)(inp_cat)))
@@ -84,14 +84,14 @@ class ModelNN(oriModel):
             )
         else:
             model.fit(tr_x, tr_y, batch_size=batch_size, nb_epoch=nb_epoch)
-        model.load_weights(f"../output/model/model_{self.run_fold_name}.hdf5")  # type: ignore
+        model.load_weights(f"../output/model/model_{self.run_fold_name}.hdf5")
 
         # モデル・スケーラーの保持
         self.model = model
 
     def predict(self, te_x: pd.DataFrame) -> np.ndarray:
         numerical_features = [
-            c for c in te_x.columns if c not in self.categorical_features  # type: ignore
+            c for c in te_x.columns if c not in self.categorical_features
         ]
         te_x = get_keras_data(te_x, numerical_features, self.categorical_features)
         pred = self.model.predict(te_x)  # type: ignore
