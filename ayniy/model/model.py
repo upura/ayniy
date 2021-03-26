@@ -10,7 +10,7 @@ class Model(metaclass=ABCMeta):
         self,
         run_fold_name: str,
         params: Dict[Any, Any],
-        categorical_features: List[str] = list(),
+        categorical_features: List[str] = [],  # noqa: B006
     ) -> None:
         self.run_fold_name = run_fold_name
         self.params = params

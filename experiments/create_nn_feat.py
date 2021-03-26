@@ -18,7 +18,7 @@ if __name__ == "__main__":
             prep = StandardScaler()
             X_train[c] = prep.fit_transform(X_train[[c]])
             X_test[c] = prep.transform(X_test[[c]])
-        except:
+        except ValueError:
             del_col.append(c)
     print(del_col)
     print(len(del_col))

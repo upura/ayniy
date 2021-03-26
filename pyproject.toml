@@ -11,7 +11,3 @@ paths = ["."]
 
 [tool.pysen.lint.source]
 excludes = ["docs/"]
-
-[flake8]
-ignore = "W503,E722,I001,F403,F401"
-max-line-length = 160

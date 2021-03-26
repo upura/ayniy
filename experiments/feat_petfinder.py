@@ -93,7 +93,7 @@ if __name__ == "__main__":
             CountEncoder(),
         ],
         input_df=train[categorical_cols],
-        output_filename="../input/petfinder-adoption-prediction/ConcatCombinationCountEncoder.ftr",
+        output_filename="../input/petfinder-adoption-prediction/ConcatCombinationCountEncoder.ftr",  # noqa: B950
     )
 
     # TargetEncoder

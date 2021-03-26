@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 import matplotlib.pyplot as plt
 import mlflow
@@ -266,7 +266,8 @@ class Runner:
             logger.info(f"{self.run_name} - end prediction fold:{i_fold}")
             if show_feature_importance:
                 feature_importances = pd.concat(
-                    [feature_importances, model.feature_importance(X_test)], axis=0  # type: ignore
+                    [feature_importances, model.feature_importance(X_test)],  # type: ignore
+                    axis=0,
                 )
 
         # 予測の平均値を出力する
