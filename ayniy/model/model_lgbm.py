@@ -6,10 +6,9 @@ import lightgbm as lgb
 import numpy as np
 import optuna.integration.lightgbm as optuna_lgb
 import pandas as pd
-from scipy.misc import derivative
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
+from scipy.misc import derivative
 
 
 class ModelLGBM(Model):

@@ -5,15 +5,6 @@ import mlflow
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from mlflow import log_artifact, log_metric, log_param
-from sklearn.metrics import (
-    average_precision_score,
-    log_loss,
-    mean_absolute_error,
-    mean_squared_error,
-    roc_auc_score,
-)
-
 from ayniy.model import (
     ModelCatClassifier,
     ModelCatRegressor,
@@ -30,6 +21,14 @@ from ayniy.model import (
 )
 from ayniy.model.model import Model
 from ayniy.utils import Data, Logger
+from mlflow import log_artifact, log_metric, log_param
+from sklearn.metrics import (
+    average_precision_score,
+    log_loss,
+    mean_absolute_error,
+    mean_squared_error,
+    roc_auc_score,
+)
 
 logger = Logger()
 models_map = {

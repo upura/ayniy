@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import Ridge
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
+from sklearn.linear_model import Ridge
 
 
 class ModelRIDGE(Model):

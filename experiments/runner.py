@@ -1,9 +1,8 @@
 import argparse
 
 import yaml
-from sklearn.model_selection import StratifiedKFold
-
 from ayniy.model.runner import Runner
+from sklearn.model_selection import StratifiedKFold
 
 if __name__ == "__main__":
     """

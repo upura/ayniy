@@ -1,16 +1,14 @@
-from sklearn.preprocessing import StandardScaler
-
 from ayniy.utils import Data
-
+from sklearn.preprocessing import StandardScaler
 
 if __name__ == "__main__":
 
-    fe_id = 'fe000'
-    fe_name = f'{fe_id}_nn_small'
+    fe_id = "fe000"
+    fe_name = f"{fe_id}_nn_small"
 
-    X_train = Data.load(f'../input/pickle/X_train_{fe_id}.pkl')
-    y_train = Data.load(f'../input/pickle/y_train_{fe_id}.pkl')
-    X_test = Data.load(f'../input/pickle/X_test_{fe_id}.pkl')
+    X_train = Data.load(f"../input/pickle/X_train_{fe_id}.pkl")
+    y_train = Data.load(f"../input/pickle/y_train_{fe_id}.pkl")
+    X_test = Data.load(f"../input/pickle/X_test_{fe_id}.pkl")
 
     del_col = []
     for c in X_train.columns:
@@ -31,6 +29,6 @@ if __name__ == "__main__":
     X_train = X_train.loc[:100]
     y_train = y_train.loc[:100]
 
-    Data.dump(X_train, f'../input/pickle/X_train_{fe_name}.pkl')
-    Data.dump(y_train, f'../input/pickle/y_train_{fe_name}.pkl')
-    Data.dump(X_test, f'../input/pickle/X_test_{fe_name}.pkl')
+    Data.dump(X_train, f"../input/pickle/X_train_{fe_name}.pkl")
+    Data.dump(y_train, f"../input/pickle/y_train_{fe_name}.pkl")
+    Data.dump(X_test, f"../input/pickle/X_test_{fe_name}.pkl")

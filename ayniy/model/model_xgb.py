@@ -3,7 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
 

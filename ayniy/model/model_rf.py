@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 
 class ModelRFRegressor(Model):

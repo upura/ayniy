@@ -3,7 +3,6 @@ import os
 import catboost as cb
 import numpy as np
 import pandas as pd
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
 

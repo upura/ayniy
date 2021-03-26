@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.neighbors import KNeighborsClassifier
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
+from sklearn.neighbors import KNeighborsClassifier
 
 
 class ModelKNN(Model):

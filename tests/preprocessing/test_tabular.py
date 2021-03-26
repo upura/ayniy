@@ -2,7 +2,6 @@ import datetime
 
 import numpy as np
 import pandas as pd
-
 from ayniy.preprocessing import (
     aggregation,
     circle_encoding,
