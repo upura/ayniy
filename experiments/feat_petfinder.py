@@ -55,7 +55,13 @@ if __name__ == "__main__":
 
     # ArithmeticCombinations
     xfeat_runner(
-        pipelines=[ArithmeticCombinations(drop_origin=True, operator="+", r=2,)],
+        pipelines=[
+            ArithmeticCombinations(
+                drop_origin=True,
+                operator="+",
+                r=2,
+            )
+        ],
         input_df=train[numerical_cols],
         output_filename="../input/petfinder-adoption-prediction/ArithmeticCombinations.ftr",
     )

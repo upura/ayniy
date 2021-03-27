@@ -39,8 +39,8 @@ class Data:
 
 
 def reduce_mem_usage(df: pd.DataFrame) -> pd.DataFrame:
-    """ iterate through all the columns of a dataframe and modify the data type
-        to reduce memory usage.
+    """iterate through all the columns of a dataframe and modify the data type
+    to reduce memory usage.
     """
     start_mem = df.memory_usage().sum() / 1024 ** 2
     print("Memory usage of dataframe is {:.2f} MB".format(start_mem))

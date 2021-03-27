@@ -1,6 +1,6 @@
 [tool.pysen]
 version = "0.9"
- 
+
 [tool.pysen.lint]
 enable_black = true
 enable_flake8 = true

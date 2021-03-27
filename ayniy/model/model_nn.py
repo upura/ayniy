@@ -72,7 +72,9 @@ class ModelNN(oriModel):
 
         if validation:
             early_stopping = keras.callbacks.EarlyStopping(
-                patience=patience, min_delta=0.001, restore_best_weights=True,
+                patience=patience,
+                min_delta=0.001,
+                restore_best_weights=True,
             )
             model.fit(
                 tr_x,
