@@ -17,7 +17,7 @@ def seed_everything(seed: int = 777) -> None:
     random.seed(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)
     np.random.seed(seed)
-    torch.manual_seed(seed)  # type: ignore
+    torch.manual_seed(seed)
 
 
 @contextmanager

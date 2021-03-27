@@ -111,7 +111,7 @@ class ModelOptunaLGBM(Model):
         # 学習
         if validation:
             early_stopping_rounds = params.pop("early_stopping_rounds")
-            self.model = optuna_lgb.train(  # type: ignore
+            self.model = optuna_lgb.train(
                 params,
                 lgb_train,
                 num_round,
@@ -122,7 +122,7 @@ class ModelOptunaLGBM(Model):
                 tuning_history=tuning_history,
             )
         else:
-            self.model = optuna_lgb.train(  # type: ignore
+            self.model = optuna_lgb.train(
                 params,
                 lgb_train,
                 num_round,
