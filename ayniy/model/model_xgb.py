@@ -3,7 +3,6 @@ import os
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
 
@@ -46,12 +45,16 @@ class ModelXGB(Model):
 
     def predict(self, te_x: pd.DataFrame) -> np.ndarray:
         dtest = xgb.DMatrix(te_x)
-        return self.model.predict(dtest, ntree_limit=self.model.best_ntree_limit)  # type: ignore
+        return self.model.predict(  # type: ignore
+            dtest, ntree_limit=self.model.best_ntree_limit  # type: ignore
+        )
 
     def feature_importance(self, te_x: pd.DataFrame) -> pd.DataFrame:
         fold_importance_df = pd.DataFrame()
         fold_importance_df["Feature"] = te_x.columns.values
-        fold_importance_df["importance"] = list(self.model.get_score(importance_type="gain").values())  # type: ignore
+        fold_importance_df["importance"] = list(
+            self.model.get_score(importance_type="gain").values()  # type: ignore
+        )
         return fold_importance_df
 
     def save_model(self) -> None:

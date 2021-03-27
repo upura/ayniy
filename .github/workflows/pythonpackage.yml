@@ -8,7 +8,6 @@ on:
 
 jobs:
   checks:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,19 +19,13 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install flake8 black mypy
+    - name: Install pysen
       run:
         python -m pip install --upgrade pip
-        pip install flake8==3.7.9 black==19.10b0 mypy==0.782 flake8-isort==4.0.0
-    - name: black
+        pip install pysen[lint]==0.9.0
+    - name: pysen
       run:
-        black .
-    - name: Lint with flake8
-      run:
-        flake8 . --max-line-length=160 --statistics --ignore=W503,E722,I001,I003,I004,I005 --exclude="docs"
-    - name: mypy
-      run:
-        mypy --disallow-untyped-defs --ignore-missing-imports .
+        pysen run lint
 
   test:
     runs-on: ubuntu-latest

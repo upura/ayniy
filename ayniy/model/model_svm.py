@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.svm import SVC
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
+from sklearn.svm import SVC
 
 
 class ModelSVM(Model):

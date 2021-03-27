@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import Ridge
-
 from ayniy.model.model import Model
 from ayniy.utils import Data
+from sklearn.linear_model import Ridge
 
 
 class ModelRIDGE(Model):
@@ -29,7 +28,7 @@ class ModelRIDGE(Model):
     def feature_importance(self, te_x: pd.DataFrame) -> pd.DataFrame:
         fold_importance_df = pd.DataFrame()
         fold_importance_df["Feature"] = te_x.columns.values
-        fold_importance_df["importance"] = self.model.coef_  # type: ignore
+        fold_importance_df["importance"] = self.model.coef_
         return fold_importance_df
 
     def save_model(self) -> None:

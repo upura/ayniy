@@ -1,19 +1,10 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from mlflow import log_artifact, log_metric, log_param
-from sklearn.metrics import (
-    average_precision_score,
-    log_loss,
-    mean_absolute_error,
-    mean_squared_error,
-    roc_auc_score,
-)
-
 from ayniy.model import (
     ModelCatClassifier,
     ModelCatRegressor,
@@ -30,6 +21,14 @@ from ayniy.model import (
 )
 from ayniy.model.model import Model
 from ayniy.utils import Data, Logger
+from mlflow import log_artifact, log_metric, log_param
+from sklearn.metrics import (
+    average_precision_score,
+    log_loss,
+    mean_absolute_error,
+    mean_squared_error,
+    roc_auc_score,
+)
 
 logger = Logger()
 models_map = {
@@ -267,7 +266,8 @@ class Runner:
             logger.info(f"{self.run_name} - end prediction fold:{i_fold}")
             if show_feature_importance:
                 feature_importances = pd.concat(
-                    [feature_importances, model.feature_importance(X_test)], axis=0  # type: ignore
+                    [feature_importances, model.feature_importance(X_test)],  # type: ignore
+                    axis=0,
                 )
 
         # 予測の平均値を出力する
@@ -321,7 +321,7 @@ class Runner:
             run_fold_name, self.params, self.cols_definition["categorical_col"]
         )
 
-    def load_index_fold(self, i_fold: int) -> List:
+    def load_index_fold(self, i_fold: int) -> np.array:
         """クロスバリデーションでのfoldを指定して対応するレコードのインデックスを返す
         :param i_fold: foldの番号
         :return: foldに対応するレコードのインデックス
