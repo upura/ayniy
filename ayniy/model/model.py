@@ -9,7 +9,7 @@ class Model(metaclass=ABCMeta):
     def __init__(
         self,
         run_fold_name: str,
-        params: Dict[Any, Any],
+        params: Dict[str, Any],
         categorical_features: List[str] = [],  # noqa: B006
     ) -> None:
         self.run_fold_name = run_fold_name

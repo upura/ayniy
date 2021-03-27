@@ -105,7 +105,7 @@ class ModelOptunaLGBM(Model):
         # ハイパーパラメータの設定
         params = dict(self.params)
         num_round = params.pop("num_boost_round")
-        best_params: Dict[Any, Any] = dict()
+        best_params: Dict[str, Any] = dict()
         tuning_history: List[Any] = list()
 
         # 学習

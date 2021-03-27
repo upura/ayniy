@@ -105,7 +105,7 @@ class Logger:
     def result(self, message: str) -> None:
         self.result_logger.info(message)
 
-    def result_ltsv(self, dic: Dict[Any, Any]) -> None:
+    def result_ltsv(self, dic: Dict[str, Any]) -> None:
         self.result(self.to_ltsv(dic))
 
     def result_scores(self, run_name: str, scores: List[Any]) -> None:
@@ -120,7 +120,7 @@ class Logger:
     def now_string(self) -> str:
         return str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    def to_ltsv(self, dic: Dict[Any, Any]) -> str:
+    def to_ltsv(self, dic: Dict[str, Any]) -> str:
         return "\t".join(["{}:{}".format(key, value) for key, value in dic.items()])
 
 
