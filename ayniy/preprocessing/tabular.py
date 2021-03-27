@@ -28,22 +28,25 @@ def detect_delete_cols(
     buf = train.corr()
     counter = 0
     high_corr_cols = []
-    for feat_a in [x for x in train.columns if x not in escape_col]:
-        for feat_b in [x for x in train.columns if x not in escape_col]:
-            if (
-                feat_a != feat_b
-                and feat_a not in high_corr_cols
-                and feat_b not in high_corr_cols
-            ):
-                c = buf.loc[feat_a, feat_b]
-                if c > threshold:
-                    counter += 1
-                    high_corr_cols.append(feat_b)
-                    print(
-                        "{}: FEAT_A: {} FEAT_B: {} - Correlation: {}".format(
-                            counter, feat_a, feat_b, c
+    try:
+        for feat_a in [x for x in train.columns if x not in escape_col]:
+            for feat_b in [x for x in train.columns if x not in escape_col]:
+                if (
+                    feat_a != feat_b
+                    and feat_a not in high_corr_cols
+                    and feat_b not in high_corr_cols
+                ):
+                    c = buf.loc[feat_a, feat_b]
+                    if c > threshold:
+                        counter += 1
+                        high_corr_cols.append(feat_b)
+                        print(
+                            "{}: FEAT_A: {} FEAT_B: {} - Correlation: {}".format(
+                                counter, feat_a, feat_b, c
+                            )
                         )
-                    )
+    except KeyError:
+        pass
     return unique_cols, duplicated_cols, high_corr_cols
 
 
@@ -296,7 +299,7 @@ class CategoryVectorizer:
                     dataframe, col1, col2, feature, name=self.name
                 )
                 features.append(feature)
-            except KeyError:
+            except ValueError:
                 pass
         features = pd.concat(features, axis=1)
         return features
