@@ -33,6 +33,7 @@ runner.submission()
 | Nishika| [財務・非財務情報を活用した株主価値予測](https://www.nishika.com/competitions/4/summary) | 2 | [Link](https://github.com/upura/nishika-yuho) |
 | SIGNATE | [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
 | ProbSpace | [YouTube動画視聴回数予測](https://prob.space/competitions/youtube-view-count) | 6 | [Link](https://github.com/upura/probspace-youtube) |
+| Solafune | [夜間光データから土地価格を予測](https://solafune.com/#/competitions/f03f39cc-597b-4819-b1a5-41479d4b73d6) | 6 | [Link](https://github.com/upura/solafune-light) |
 | atmaCup | [#8 [初心者向] atmaCup](https://www.guruguru.science/competitions/13/) | - | [Link](https://github.com/upura/atmaCup8) |
 | Kaggle | [WiDS Datathon 2021](https://www.kaggle.com/c/widsdatathon2021) | 64 | [Link](https://github.com/upura/widsdatathon2021) |
 | Kaggle | [Titanic: Machine Learning from Disaster](https://www.kaggle.com/c/titanic/) | - | [Link](https://github.com/upura/ayniy-titanic) |
