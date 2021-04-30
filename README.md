@@ -82,14 +82,8 @@ from ayniy.model.runner import Runner
 ### Test
 
 ```bash
-# pytest
-pytest tests/ --cov=. --cov-report=html
-# black
-black .
-# flake8
-flake8 .
-# mypy
-mypy .
+pysen run lint
+pysen run format
 ```
 
 ### Docs
