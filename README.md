@@ -31,6 +31,7 @@ runner.submission()
 | --- | --- | --- | --- | 
 | CodaLab | [Basketball Behavior Challenge BBC2020](https://competitions.codalab.org/competitions/23905) | 1 | [Link](https://github.com/upura/basketball-behavior-challenge) |
 | Nishika| [財務・非財務情報を活用した株主価値予測](https://www.nishika.com/competitions/4/summary) | 2 | [Link](https://github.com/upura/nishika-yuho) |
+| SIGIR2021| [SIGIR eCOM 2021 Data Challenge](https://github.com/upura/sigir-ecom-2021) | 3 | [Link](https://sigir-ecom.github.io/data-task.html) |
 | SIGNATE | [ひろしまQuest2020#stayhome【アイデア部門】](https://signate.jp/competitions/277) | - | [Link](https://github.com/upura/signate-hiroshima-quest-idea) |
 | ProbSpace | [YouTube動画視聴回数予測](https://prob.space/competitions/youtube-view-count) | 6 | [Link](https://github.com/upura/probspace-youtube) |
 | Solafune | [夜間光データから土地価格を予測](https://solafune.com/#/competitions/f03f39cc-597b-4819-b1a5-41479d4b73d6) | 6 | [Link](https://github.com/upura/solafune-light) |
