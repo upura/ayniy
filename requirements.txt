@@ -3,7 +3,7 @@ japanize-matplotlib==1.1.2
 kaggler==0.8.12
 konoha[all]==4.6.2
 mecab-python3==0.996.5
-mlflow==1.10.0
+mlflow==1.23.1
 neologdn==0.4
 node2vec==0.4.0
 pysen[lint]==0.9.0
